@@ -16,20 +16,14 @@ from pathlib import Path
 
 from gaussian_scraper.extractor import extract_relevant_passages
 from gaussian_scraper.fetcher import fetch_page_text
-from gaussian_scraper.sources import GAUSSIAN_SOURCES
+from gaussian_scraper.sources import GAUSSIAN_SOURCES, STACKEXCHANGE_SOURCES
+from gaussian_scraper.stackexchange import fetch_se_passages
 
 OUTPUT_PATH = Path.home() / ".inkly" / "gaussian_docs.json"
 
 
-def scrape_all_sources() -> list[dict]:
-    """
-    Scrape all configured sources and return a list of result records.
-
-    Each record contains:
-    - label: human-readable name of the source
-    - url: the page that was scraped
-    - passages: list of relevant text passages extracted from that page
-    """
+def scrape_html_sources() -> list[dict]:
+    """Scrape curated HPC documentation pages and return result records."""
     results = []
 
     for source in GAUSSIAN_SOURCES:
@@ -42,16 +36,16 @@ def scrape_all_sources() -> list[dict]:
         text = fetch_page_text(url)
 
         if text is None:
-            print(f"  SKIPPED — could not fetch page")
+            print(f"  SKIPPED - could not fetch page")
             continue
 
         passages = extract_relevant_passages(text)
 
         if not passages:
-            print(f"  SKIPPED — no relevant passages found")
+            print(f"  SKIPPED - no relevant passages found")
             continue
 
-        print(f"  OK — {len(passages)} passages extracted")
+        print(f"  OK - {len(passages)} passages extracted")
         results.append({
             "label": label,
             "url": url,
@@ -61,11 +55,41 @@ def scrape_all_sources() -> list[dict]:
     return results
 
 
+def scrape_se_sources() -> list[dict]:
+    """Fetch top-voted questions from Stack Exchange sources and return result records."""
+    results = []
+
+    for source in STACKEXCHANGE_SOURCES:
+        label = source["label"]
+        tag = source["tag"]
+        site = source["site"]
+
+        print(f"Fetching: {label}")
+        print(f"  Site: {site}, Tag: {tag}")
+
+        passages = fetch_se_passages(tag=tag, site=site)
+
+        if passages is None:
+            print(f"  SKIPPED - could not reach API")
+            continue
+
+        if not passages:
+            print(f"  SKIPPED - no relevant passages found")
+            continue
+
+        print(f"  OK - {len(passages)} passages extracted")
+        results.append({
+            "label": label,
+            "site": site,
+            "tag": tag,
+            "passages": passages,
+        })
+
+    return results
+
+
 def save_results(results: list[dict]) -> None:
-    """
-    Save scraped results to the output JSON file.
-    Creates the ~/.inkly directory if it doesn't exist yet.
-    """
+    """Save scraped results to the output JSON file."""
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_text(
         json.dumps(results, indent=2),
@@ -76,7 +100,12 @@ def save_results(results: list[dict]) -> None:
 
 if __name__ == "__main__":
     print("=== Gaussian Docs Scraper ===\n")
-    results = scrape_all_sources()
+
+    print("--- HPC Documentation Pages ---")
+    results = scrape_html_sources()
+
+    print("\n--- Stack Exchange ---")
+    results += scrape_se_sources()
 
     if not results:
         print("\nNo results collected. Check network access or source URLs.")

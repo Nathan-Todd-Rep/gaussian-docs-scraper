@@ -33,6 +33,16 @@ GAUSSIAN_SOURCES = [
 
 # Keywords used to decide whether a paragraph is relevant enough to keep.
 # A passage must contain at least one of these (case-insensitive) to be retained.
+STACKEXCHANGE_SOURCES = [
+    {
+        "label": "Chemistry Stack Exchange - gaussian tag",
+        "tag": "gaussian",
+        "site": "chemistry",
+    },
+]
+
+# Keywords used to decide whether a paragraph is relevant enough to keep.
+# A passage must contain at least one of these (case-insensitive) to be retained.
 GAUSSIAN_KEYWORDS = [
     "gaussian",
     "g09",
