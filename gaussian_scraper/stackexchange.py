@@ -14,6 +14,49 @@ def _strip_html(html: str) -> str:
     return BeautifulSoup(html, "html.parser").get_text(separator=" ", strip=True)
 
 
+def _fetch_answer_bodies(question_ids: list[int], site: str) -> list[str]:
+    """
+    Fetch answer bodies for the given question IDs.
+    Returns a list of plain text strings sorted by vote score.
+    Returns an empty list on any failure so callers can degrade gracefully.
+    """
+    if not question_ids:
+        return []
+
+    ids_str = ";".join(str(i) for i in question_ids)
+
+    try:
+        response = requests.get(
+            f"{SE_API_BASE}/questions/{ids_str}/answers",
+            params={
+                "site": site,
+                "filter": "withbody",
+                "order": "desc",
+                "sort": "votes",
+                "pagesize": min(len(question_ids) * 2, 100),
+            },
+            timeout=REQUEST_TIMEOUT_SEC,
+        )
+    except requests.RequestException:
+        return []
+
+    if response.status_code != 200:
+        return []
+
+    try:
+        data = response.json()
+    except ValueError:
+        return []
+
+    bodies = []
+    for answer in data.get("items", []):
+        body_text = _strip_html(answer.get("body", ""))
+        if body_text:
+            bodies.append(body_text)
+
+    return bodies
+
+
 def fetch_se_passages(
     tag: str,
     site: str = "chemistry",
@@ -21,15 +64,16 @@ def fetch_se_passages(
     keywords: list[str] | None = None,
 ) -> list[str] | None:
     """
-    Fetch top-voted questions from a Stack Exchange site by tag and return
-    relevant passages.
+    Fetch top-voted questions and their answers from a Stack Exchange site
+    by tag and return relevant passages.
 
-    Each question contributes two kinds of passages:
+    Each question contributes passages from:
     - The question title, if it contains a keyword
     - Lines from the question body, filtered the same way as HTML page text
+    - Lines from the top answers to those questions
 
-    Returns None if the request fails. Returns an empty list if the request
-    succeeds but no relevant passages are found.
+    Returns None if the questions request fails. Returns an empty list if
+    the request succeeds but no relevant passages are found.
     """
     if keywords is None:
         keywords = GAUSSIAN_KEYWORDS
@@ -61,8 +105,14 @@ def fetch_se_passages(
         return None
 
     passages = []
+    question_ids = []
 
     for question in data.get("items", []):
+        question_ids.append(question.get("question_id"))
+
+        if len(passages) >= MAX_PASSAGES_PER_SOURCE:
+            continue
+
         title = question.get("title", "")
         body_text = _strip_html(question.get("body", ""))
 
@@ -72,7 +122,7 @@ def fetch_se_passages(
         ):
             passages.append(title)
             if len(passages) >= MAX_PASSAGES_PER_SOURCE:
-                return passages
+                continue
 
         for line in body_text.splitlines():
             stripped = line.strip()
@@ -81,6 +131,17 @@ def fetch_se_passages(
             if any(kw in stripped.lower() for kw in lower_keywords):
                 passages.append(stripped)
             if len(passages) >= MAX_PASSAGES_PER_SOURCE:
-                return passages
+                break
+
+    if question_ids and len(passages) < MAX_PASSAGES_PER_SOURCE:
+        for body_text in _fetch_answer_bodies(question_ids, site):
+            for line in body_text.splitlines():
+                stripped = line.strip()
+                if len(stripped) < MIN_PASSAGE_LENGTH:
+                    continue
+                if any(kw in stripped.lower() for kw in lower_keywords):
+                    passages.append(stripped)
+                if len(passages) >= MAX_PASSAGES_PER_SOURCE:
+                    return passages
 
     return passages if passages else None

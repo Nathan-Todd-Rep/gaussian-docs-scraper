@@ -2,19 +2,31 @@ from __future__ import annotations
 
 import requests
 from types import SimpleNamespace
-import json
 
 from gaussian_scraper import stackexchange
 from gaussian_scraper.stackexchange import fetch_se_passages
 
 
 def _fake_response(status_code: int, data: dict):
-    """Build a fake requests response that returns JSON."""
-    ns = SimpleNamespace(
+    return SimpleNamespace(
         status_code=status_code,
         json=lambda: data,
     )
-    return ns
+
+
+def _make_fake_get(questions_data: dict, answers_data: dict | None = None):
+    """
+    Returns a fake requests.get that dispatches by URL.
+    Questions endpoint gets questions_data, answers endpoint gets answers_data.
+    """
+    answers_data = answers_data or {"items": []}
+
+    def fake_get(url, *args, **kwargs):
+        if "answers" in url:
+            return _fake_response(200, answers_data)
+        return _fake_response(200, questions_data)
+
+    return fake_get
 
 
 SAMPLE_QUESTION = {
@@ -23,6 +35,14 @@ SAMPLE_QUESTION = {
     "body": "<p>I am trying to run a Gaussian g16 DFT calculation on an HPC cluster.</p>"
             "<p>What values should I use for %mem and %nproc in my input file?</p>",
     "score": 42,
+}
+
+SAMPLE_ANSWER = {
+    "answer_id": 101,
+    "question_id": 1,
+    "body": "<p>Set %mem=8GB and %nproc=4 in your Gaussian input file to match your Slurm request.</p>",
+    "score": 30,
+    "is_accepted": True,
 }
 
 
@@ -51,11 +71,11 @@ def test_fetch_se_returns_none_on_non_200(monkeypatch):
     assert result is None
 
 
-def test_fetch_se_returns_empty_list_when_no_items(monkeypatch):
+def test_fetch_se_returns_none_when_no_items(monkeypatch):
     monkeypatch.setattr(
         requests,
         "get",
-        lambda *a, **kw: _fake_response(200, {"items": [], "has_more": False}),
+        _make_fake_get({"items": [], "has_more": False}),
     )
 
     result = fetch_se_passages(tag="gaussian", site="chemistry")
@@ -63,13 +83,13 @@ def test_fetch_se_returns_empty_list_when_no_items(monkeypatch):
     assert result is None
 
 
-# --- passage extraction ---
+# --- question passage extraction ---
 
 def test_fetch_se_extracts_title_as_passage(monkeypatch):
     monkeypatch.setattr(
         requests,
         "get",
-        lambda *a, **kw: _fake_response(200, {"items": [SAMPLE_QUESTION]}),
+        _make_fake_get({"items": [SAMPLE_QUESTION]}),
     )
 
     result = fetch_se_passages(tag="gaussian", site="chemistry")
@@ -89,15 +109,13 @@ def test_fetch_se_strips_html_from_body(monkeypatch):
     monkeypatch.setattr(
         requests,
         "get",
-        lambda *a, **kw: _fake_response(200, {"items": [question]}),
+        _make_fake_get({"items": [question]}),
     )
 
     result = fetch_se_passages(tag="gaussian", site="chemistry")
 
     assert result is not None
-    # HTML tags should be gone
     assert all("<" not in p for p in result)
-    # Text content should be present
     assert any("%mem" in p or "Gaussian" in p for p in result)
 
 
@@ -117,10 +135,72 @@ def test_fetch_se_caps_at_max_passages(monkeypatch):
     monkeypatch.setattr(
         requests,
         "get",
-        lambda *a, **kw: _fake_response(200, {"items": items}),
+        _make_fake_get({"items": items}),
     )
 
     result = fetch_se_passages(tag="gaussian", site="chemistry")
 
     assert result is not None
     assert len(result) == 3
+
+
+# --- answer passage extraction ---
+
+def test_fetch_se_includes_answer_passages(monkeypatch):
+    question_with_no_body = {
+        "question_id": 1,
+        "title": "Short title",
+        "body": "<p>Short.</p>",
+        "score": 10,
+    }
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        _make_fake_get(
+            questions_data={"items": [question_with_no_body]},
+            answers_data={"items": [SAMPLE_ANSWER]},
+        ),
+    )
+
+    result = fetch_se_passages(tag="gaussian", site="chemistry")
+
+    assert result is not None
+    assert any("%mem" in p for p in result)
+
+
+def test_fetch_se_answer_html_is_stripped(monkeypatch):
+    answer_with_html = {
+        "answer_id": 200,
+        "question_id": 1,
+        "body": "<p>Use <code>%mem=16GB</code> and <strong>%nproc=8</strong> for large Gaussian DFT jobs on the cluster.</p>",
+        "score": 20,
+    }
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        _make_fake_get(
+            questions_data={"items": [SAMPLE_QUESTION]},
+            answers_data={"items": [answer_with_html]},
+        ),
+    )
+
+    result = fetch_se_passages(tag="gaussian", site="chemistry")
+
+    assert result is not None
+    assert all("<" not in p for p in result)
+
+
+def test_fetch_se_returns_question_passages_if_answers_fail(monkeypatch):
+    def fake_get(url, *args, **kwargs):
+        if "answers" in url:
+            raise requests.RequestException("timeout")
+        return _fake_response(200, {"items": [SAMPLE_QUESTION]})
+
+    monkeypatch.setattr(requests, "get", fake_get)
+
+    result = fetch_se_passages(tag="gaussian", site="chemistry")
+
+    assert result is not None
+    assert len(result) > 0
