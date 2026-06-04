@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 REQUEST_TIMEOUT_SEC = 10
 
 # Tags that contain visible documentation content.
-# We skip nav, header, footer, and script tags as they contain UI noise.
+# skip nav, header, footer, and script tags as they contain UI noise.
 CONTENT_TAGS = ["p", "li", "pre", "code", "h1", "h2", "h3", "h4"]
 
 
