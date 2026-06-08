@@ -4,7 +4,7 @@ A scraper that collects Gaussian-related passages from HPC documentation sources
 
 ---
 
-## What It Does
+## What does it do?
 
 It pulls content from two source types:
 
@@ -17,7 +17,7 @@ Passages are keyword-filtered and capped per source to keep the output focused. 
 
 ## Installation
 
-Install dependencies:
+Install dependencies (BS4):
 
 ```bash
 pip install requests beautifulsoup4
@@ -48,7 +48,7 @@ ollama pull llama3
 ollama serve
 ```
 
-If Ollama is not running, the scraper falls back to storing raw passages — no setup required to use the scraper without it.
+If Ollama is not running, the scraper falls back to storing raw passages, no setup required to use the scraper without it.
 
 ---
 
