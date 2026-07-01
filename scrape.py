@@ -18,7 +18,7 @@ from gaussian_scraper.extractor import extract_relevant_passages
 from gaussian_scraper.fetcher import fetch_page_text
 from gaussian_scraper.sources import GAUSSIAN_SOURCES, STACKEXCHANGE_SOURCES
 from gaussian_scraper.stackexchange import fetch_se_passages
-from gaussian_scraper.summarizer import summarize_passages
+from gaussian_scraper.summarizer import is_ollama_available, summarize_passages
 
 OUTPUT_PATH = Path.home() / ".inkly" / "gaussian_docs.json"
 
@@ -34,10 +34,11 @@ def scrape_html_sources() -> list[dict]:
         print(f"Fetching: {label}")
         print(f"  URL: {url}")
 
-        text = fetch_page_text(url)
+        text, status = fetch_page_text(url)
 
         if text is None:
-            print(f"  SKIPPED - could not fetch page")
+            reason = f"HTTP {status}" if status else "network error"
+            print(f"  SKIPPED - {reason}")
             continue
 
         passages = extract_relevant_passages(text)
@@ -92,15 +93,20 @@ def scrape_se_sources() -> list[dict]:
 def summarize_results(results: list[dict]) -> None:
     """Attempt to summarize each result's passages using a local Ollama instance."""
     print("\n--- Summarizing with Ollama ---")
+
+    if not is_ollama_available():
+        print("  Ollama not reachable - skipping summarization")
+        return
+
     for result in results:
         label = result["label"]
         print(f"  Summarizing: {label}")
-        summary = summarize_passages(result["passages"])
+        summary = summarize_passages(result["passages"], label=label)
         if summary:
             result["summary"] = summary
             print(f"  OK")
         else:
-            print(f"  SKIPPED - Ollama not available or no response")
+            print(f"  SKIPPED - no response from Ollama")
 
 
 def save_results(results: list[dict]) -> None:

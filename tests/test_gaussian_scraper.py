@@ -70,9 +70,10 @@ def test_fetch_returns_none_on_request_error(monkeypatch):
 
     monkeypatch.setattr(requests, "get", fake_get)
 
-    result = fetch_page_text("http://fake-url.example.com")
+    text, status = fetch_page_text("http://fake-url.example.com")
 
-    assert result is None
+    assert text is None
+    assert status is None
 
 
 def test_fetch_returns_none_on_non_200_status(monkeypatch):
@@ -85,9 +86,10 @@ def test_fetch_returns_none_on_non_200_status(monkeypatch):
         lambda *a, **kw: SimpleNamespace(status_code=404, text=""),
     )
 
-    result = fetch_page_text("http://fake-url.example.com")
+    text, status = fetch_page_text("http://fake-url.example.com")
 
-    assert result is None
+    assert text is None
+    assert status == 404
 
 
 def test_fetch_extracts_text_from_html(monkeypatch):
@@ -111,10 +113,11 @@ def test_fetch_extracts_text_from_html(monkeypatch):
         lambda *a, **kw: SimpleNamespace(status_code=200, text=fake_html),
     )
 
-    result = fetch_page_text("http://fake-url.example.com")
+    text, status = fetch_page_text("http://fake-url.example.com")
 
-    assert result is not None
-    assert "Load the Gaussian module" in result
-    assert "Request memory carefully" in result
-    assert "Skip this nav content" not in result
-    assert "Skip this footer" not in result
+    assert text is not None
+    assert status == 200
+    assert "Load the Gaussian module" in text
+    assert "Request memory carefully" in text
+    assert "Skip this nav content" not in text
+    assert "Skip this footer" not in text

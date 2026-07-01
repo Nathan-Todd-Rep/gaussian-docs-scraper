@@ -3,7 +3,8 @@ from __future__ import annotations
 import requests
 from types import SimpleNamespace
 
-from gaussian_scraper.summarizer import summarize_passages
+from gaussian_scraper import summarizer
+from gaussian_scraper.summarizer import is_ollama_available, summarize_passages
 
 
 def _fake_response(status_code: int, data: dict):
@@ -18,6 +19,37 @@ SAMPLE_PASSAGES = [
     "Gaussian 16 requires the %chk directive to save checkpoint files for post-processing.",
     "Use g16 with a Slurm batch script to run DFT calculations on HPC clusters.",
 ]
+
+
+# --- is_ollama_available ---
+
+def test_is_ollama_available_returns_true_when_reachable(monkeypatch):
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(status_code=200),
+    )
+
+    assert is_ollama_available() is True
+
+
+def test_is_ollama_available_returns_false_when_not_reachable(monkeypatch):
+    def fake_get(*args, **kwargs):
+        raise requests.RequestException("connection refused")
+
+    monkeypatch.setattr(requests, "get", fake_get)
+
+    assert is_ollama_available() is False
+
+
+def test_is_ollama_available_returns_false_on_non_200(monkeypatch):
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(status_code=503),
+    )
+
+    assert is_ollama_available() is False
 
 
 # --- failure cases ---
@@ -69,6 +101,32 @@ def test_summarize_returns_none_on_empty_response_field(monkeypatch):
     result = summarize_passages(SAMPLE_PASSAGES)
 
     assert result is None
+
+
+# --- passage cap ---
+
+def test_summarize_caps_passages_sent_to_ollama(monkeypatch):
+    monkeypatch.setattr(summarizer, "MAX_PASSAGES_TO_SUMMARIZE", 3)
+
+    captured_prompt = []
+
+    def fake_post(url, json=None, **kwargs):
+        captured_prompt.append(json.get("prompt", ""))
+        return SimpleNamespace(
+            status_code=200,
+            json=lambda: {"response": "A summary."},
+        )
+
+    monkeypatch.setattr(requests, "post", fake_post)
+
+    passages = [f"Passage number {i} about Gaussian on the HPC cluster." for i in range(10)]
+    summarize_passages(passages)
+
+    assert len(captured_prompt) == 1
+    prompt = captured_prompt[0]
+    assert "Passage number 0" in prompt
+    assert "Passage number 2" in prompt
+    assert "Passage number 3" not in prompt
 
 
 # --- happy path ---
