@@ -25,6 +25,14 @@ GAUSSIAN_SOURCES = [
         "label": "Ohio Supercomputer Center - Gaussian",
         "url": "https://www.osc.edu/resources/available_software/software_list/gaussian",
     },
+    {
+        "label": "Alliance Canada - Gaussian",
+        "url": "https://docs.alliancecan.ca/wiki/Gaussian",
+    },
+    {
+        "label": "HPC Wiki - Gaussian",
+        "url": "https://hpc-wiki.info/hpc/Gaussian",
+    },
 ]
 
 # Stack Exchange sources for Gaussian-related questions and answers.
@@ -34,6 +42,26 @@ STACKEXCHANGE_SOURCES = [
     {
         "label": "Matter Modeling Stack Exchange - gaussian tag",
         "tag": "gaussian",
+        "site": "mattermodeling",
+    },
+    {
+        "label": "Matter Modeling Stack Exchange - density-functional-theory tag",
+        "tag": "density-functional-theory",
+        "site": "mattermodeling",
+    },
+    {
+        "label": "Matter Modeling Stack Exchange - computational-chemistry tag",
+        "tag": "computational-chemistry",
+        "site": "mattermodeling",
+    },
+    {
+        "label": "Matter Modeling Stack Exchange - quantum-chemistry tag",
+        "tag": "quantum-chemistry",
+        "site": "mattermodeling",
+    },
+    {
+        "label": "Matter Modeling Stack Exchange - high-performance-computing tag",
+        "tag": "high-performance-computing",
         "site": "mattermodeling",
     },
 ]

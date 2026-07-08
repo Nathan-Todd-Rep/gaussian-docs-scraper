@@ -4,7 +4,7 @@ from gaussian_scraper.sources import GAUSSIAN_KEYWORDS
 
 # Maximum number of passages to keep from a single page.
 # Keeps stored snippets focused and avoids flooding the plugin context.
-MAX_PASSAGES_PER_SOURCE = 10
+MAX_PASSAGES_PER_SOURCE = 30
 
 # Minimum number of characters a passage must have to be worth keeping.
 # Filters out single-word headings and empty lines.
