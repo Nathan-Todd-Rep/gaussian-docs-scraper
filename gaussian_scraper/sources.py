@@ -10,34 +10,31 @@ from __future__ import annotations
 
 GAUSSIAN_SOURCES = [
     {
-        "label": "Harvard RC — Gaussian",
+        "label": "Harvard RC - Gaussian",
         "url": "https://docs.rc.fas.harvard.edu/kb/gaussian/",
     },
     {
-        "label": "NERSC — Gaussian",
-        "url": "https://docs.nersc.gov/applications/chemistry/gaussian/",
+        "label": "TACC - Gaussian",
+        "url": "https://docs.tacc.utexas.edu/software/gaussian/",
     },
     {
-        "label": "Princeton RC — Gaussian",
-        "url": "https://researchcomputing.princeton.edu/support/knowledge-base/gaussian",
+        "label": "NSC Sweden - Gaussian",
+        "url": "https://www.nsc.liu.se/software/installed/tetralith/gaussian/",
     },
     {
-        "label": "University of Michigan — Gaussian",
-        "url": "https://arc-ts.umich.edu/software/gaussian/",
-    },
-    {
-        "label": "Ohio Supercomputer Center — Gaussian",
+        "label": "Ohio Supercomputer Center - Gaussian",
         "url": "https://www.osc.edu/resources/available_software/software_list/gaussian",
     },
 ]
 
-# Keywords used to decide whether a paragraph is relevant enough to keep.
-# A passage must contain at least one of these (case-insensitive) to be retained.
+# Stack Exchange sources for Gaussian-related questions and answers.
+# Matter Modeling SE has an active gaussian tag (215 questions).
+# Chemistry SE's gaussian tag no longer exists.
 STACKEXCHANGE_SOURCES = [
     {
-        "label": "Chemistry Stack Exchange - gaussian tag",
+        "label": "Matter Modeling Stack Exchange - gaussian tag",
         "tag": "gaussian",
-        "site": "chemistry",
+        "site": "mattermodeling",
     },
 ]
 
