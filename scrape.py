@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 from gaussian_scraper.config import ScraperConfig, load_toml_config
@@ -186,6 +187,15 @@ def main() -> None:
         config = run_wizard()
 
     run_scrape(config)
+
+    # If launched by double-clicking rather than from an already-open
+    # terminal, Windows closes the console the instant the script exits --
+    # the results flash by before anyone can read them. Pausing here keeps
+    # the window open. Only do this when stdin is a real interactive
+    # terminal, so automated/piped runs (CI, scripts) never hang waiting
+    # for a keypress that will never come.
+    if sys.stdin.isatty():
+        input("\nPress Enter to exit...")
 
 
 if __name__ == "__main__":
