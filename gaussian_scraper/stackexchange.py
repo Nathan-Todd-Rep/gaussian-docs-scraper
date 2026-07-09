@@ -9,6 +9,17 @@ from gaussian_scraper.sources import GAUSSIAN_KEYWORDS
 SE_API_BASE = "https://api.stackexchange.com/2.3"
 REQUEST_TIMEOUT_SEC = 10
 
+# SE sites searched during tag auto-discovery.
+# Covers the main research computing and computational science communities.
+DEFAULT_DISCOVERY_SITES = [
+    "mattermodeling",
+    "chemistry",
+    "bioinformatics",
+    "scicomp",
+]
+
+MAX_DISCOVERY_RESULTS = 10
+
 
 def _strip_html(html: str) -> str:
     return BeautifulSoup(html, "html.parser").get_text(separator=" ", strip=True)
@@ -145,3 +156,68 @@ def fetch_se_passages(
                     return passages
 
     return passages if passages else None
+
+
+def discover_se_tags(
+    topic: str,
+    sites: list[str] | None = None,
+) -> list[dict]:
+    """
+    Search Stack Exchange sites for tags matching the given topic string.
+
+    Queries the SE tags endpoint with inname={topic} across each site and
+    returns up to MAX_DISCOVERY_RESULTS results ranked by question count.
+
+    Each result is a dict with:
+        site:  SE site identifier (e.g. "mattermodeling")
+        tag:   Tag name (e.g. "gaussian")
+        count: Number of questions with this tag
+        label: Human-readable label for use in configs and output
+
+    Returns an empty list if no matching tags are found or all requests fail.
+    """
+    if not topic or not topic.strip():
+        return []
+
+    if sites is None:
+        sites = DEFAULT_DISCOVERY_SITES
+
+    results = []
+
+    for site in sites:
+        try:
+            response = requests.get(
+                f"{SE_API_BASE}/tags",
+                params={
+                    "site": site,
+                    "inname": topic.strip(),
+                    "order": "desc",
+                    "sort": "popular",
+                    "pagesize": MAX_DISCOVERY_RESULTS,
+                },
+                timeout=REQUEST_TIMEOUT_SEC,
+            )
+        except requests.RequestException:
+            continue
+
+        if response.status_code != 200:
+            continue
+
+        try:
+            data = response.json()
+        except ValueError:
+            continue
+
+        for item in data.get("items", []):
+            tag = item.get("name", "")
+            count = item.get("count", 0)
+            if tag:
+                results.append({
+                    "site": site,
+                    "tag": tag,
+                    "count": count,
+                    "label": f"{site} - {tag}",
+                })
+
+    results.sort(key=lambda r: r["count"], reverse=True)
+    return results[:MAX_DISCOVERY_RESULTS]

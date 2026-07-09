@@ -4,7 +4,7 @@ import requests
 from types import SimpleNamespace
 
 from gaussian_scraper import stackexchange
-from gaussian_scraper.stackexchange import fetch_se_passages
+from gaussian_scraper.stackexchange import discover_se_tags, fetch_se_passages
 
 
 def _fake_response(status_code: int, data: dict):
@@ -204,3 +204,99 @@ def test_fetch_se_returns_question_passages_if_answers_fail(monkeypatch):
 
     assert result is not None
     assert len(result) > 0
+
+
+# --- discover_se_tags ---
+
+def test_discover_returns_empty_for_empty_topic(monkeypatch):
+    called = []
+
+    def fake_get(*args, **kwargs):
+        called.append(True)
+        return _fake_response(200, {"items": []})
+
+    monkeypatch.setattr(requests, "get", fake_get)
+
+    result = discover_se_tags("")
+
+    assert result == []
+    assert not called
+
+
+def test_discover_returns_empty_on_all_request_errors(monkeypatch):
+    def fake_get(*args, **kwargs):
+        raise requests.RequestException("timeout")
+
+    monkeypatch.setattr(requests, "get", fake_get)
+
+    result = discover_se_tags("gaussian", sites=["mattermodeling", "chemistry"])
+
+    assert result == []
+
+
+def test_discover_skips_failed_sites(monkeypatch):
+    def fake_get(url, params=None, **kwargs):
+        site = params.get("site", "")
+        if site == "chemistry":
+            raise requests.RequestException("timeout")
+        return _fake_response(200, {"items": [
+            {"name": "gaussian", "count": 215},
+        ]})
+
+    monkeypatch.setattr(requests, "get", fake_get)
+
+    result = discover_se_tags("gaussian", sites=["mattermodeling", "chemistry"])
+
+    assert len(result) == 1
+    assert result[0]["site"] == "mattermodeling"
+
+
+def test_discover_returns_results_ranked_by_count(monkeypatch):
+    def fake_get(url, params=None, **kwargs):
+        site = params.get("site", "")
+        if site == "mattermodeling":
+            return _fake_response(200, {"items": [{"name": "gaussian", "count": 215}]})
+        if site == "chemistry":
+            return _fake_response(200, {"items": [{"name": "gaussian", "count": 950}]})
+        return _fake_response(200, {"items": []})
+
+    monkeypatch.setattr(requests, "get", fake_get)
+
+    result = discover_se_tags("gaussian", sites=["mattermodeling", "chemistry"])
+
+    assert result[0]["count"] == 950
+    assert result[1]["count"] == 215
+
+
+def test_discover_caps_at_max_results(monkeypatch):
+    monkeypatch.setattr(stackexchange, "MAX_DISCOVERY_RESULTS", 3)
+
+    items = [{"name": f"tag-{i}", "count": i} for i in range(10)]
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: _fake_response(200, {"items": items}),
+    )
+
+    result = discover_se_tags("gaussian", sites=["mattermodeling"])
+
+    assert len(result) == 3
+
+
+def test_discover_happy_path(monkeypatch):
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: _fake_response(200, {"items": [
+            {"name": "gaussian", "count": 215},
+        ]}),
+    )
+
+    result = discover_se_tags("gaussian", sites=["mattermodeling"])
+
+    assert len(result) == 1
+    assert result[0]["site"] == "mattermodeling"
+    assert result[0]["tag"] == "gaussian"
+    assert result[0]["count"] == 215
+    assert result[0]["label"] == "mattermodeling - gaussian"

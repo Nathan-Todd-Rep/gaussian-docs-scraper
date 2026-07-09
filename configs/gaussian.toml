@@ -1,0 +1,48 @@
+name = "gaussian"
+keywords = ["gaussian", "g09", "g16", "computational chemistry", "quantum chemistry", "slurm", "sbatch", "module load", "mem=", "nproc=", "%mem", "%nproc", "basis set", "dft", "density functional"]
+output_path = "C:\\Users\\Nathan\\.inkly\\gaussian_docs.json"
+
+[[html_sources]]
+label = "Harvard RC - Gaussian"
+url = "https://docs.rc.fas.harvard.edu/kb/gaussian/"
+
+[[html_sources]]
+label = "TACC - Gaussian"
+url = "https://docs.tacc.utexas.edu/software/gaussian/"
+
+[[html_sources]]
+label = "NSC Sweden - Gaussian"
+url = "https://www.nsc.liu.se/software/installed/tetralith/gaussian/"
+
+[[html_sources]]
+label = "Ohio Supercomputer Center - Gaussian"
+url = "https://www.osc.edu/resources/available_software/software_list/gaussian"
+
+[[html_sources]]
+label = "HPC Wiki - Gaussian"
+url = "https://hpc-wiki.info/hpc/Gaussian"
+
+[[se_sources]]
+label = "Matter Modeling Stack Exchange - gaussian tag"
+site = "mattermodeling"
+tag = "gaussian"
+
+[[se_sources]]
+label = "Matter Modeling Stack Exchange - density-functional-theory tag"
+site = "mattermodeling"
+tag = "density-functional-theory"
+
+[[se_sources]]
+label = "Matter Modeling Stack Exchange - computational-chemistry tag"
+site = "mattermodeling"
+tag = "computational-chemistry"
+
+[[se_sources]]
+label = "Matter Modeling Stack Exchange - quantum-chemistry tag"
+site = "mattermodeling"
+tag = "quantum-chemistry"
+
+[[se_sources]]
+label = "Matter Modeling Stack Exchange - high-performance-computing tag"
+site = "mattermodeling"
+tag = "high-performance-computing"

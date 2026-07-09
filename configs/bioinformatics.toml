@@ -1,0 +1,52 @@
+name = "bioinformatics"
+keywords = ["rna-seq", "fastq", "samtools", "bwa", "gatk", "genome", "variant-calling", "ngs", "vcf", "alignment", "bam", "blast"]
+output_path = "C:\\Users\\Nathan\\.inkly\\bioinformatics_docs.json"
+
+[[html_sources]]
+label = "Ohio Supercomputer Center - BWA"
+url = "https://www.osc.edu/resources/available_software/software_list/bwa"
+
+[[html_sources]]
+label = "Ohio Supercomputer Center - Samtools"
+url = "https://www.osc.edu/resources/available_software/software_list/samtools"
+
+[[html_sources]]
+label = "Ohio Supercomputer Center - GATK"
+url = "https://www.osc.edu/resources/available_software/software_list/gatk"
+
+[[html_sources]]
+label = "Alliance Canada - Bioinformatics"
+url = "https://docs.alliancecan.ca/wiki/Bioinformatics"
+
+[[html_sources]]
+label = "NIH HPC - Samtools"
+url = "https://hpc.nih.gov/apps/samtools.html"
+
+[[html_sources]]
+label = "NIH HPC - BWA"
+url = "https://hpc.nih.gov/apps/bwa.html"
+
+[[se_sources]]
+label = "Bioinformatics Stack Exchange - rna-seq tag"
+site = "bioinformatics"
+tag = "rna-seq"
+
+[[se_sources]]
+label = "Bioinformatics Stack Exchange - ngs tag"
+site = "bioinformatics"
+tag = "ngs"
+
+[[se_sources]]
+label = "Bioinformatics Stack Exchange - vcf tag"
+site = "bioinformatics"
+tag = "vcf"
+
+[[se_sources]]
+label = "Bioinformatics Stack Exchange - genome tag"
+site = "bioinformatics"
+tag = "genome"
+
+[[se_sources]]
+label = "Bioinformatics Stack Exchange - samtools tag"
+site = "bioinformatics"
+tag = "samtools"
