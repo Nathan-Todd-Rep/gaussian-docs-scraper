@@ -49,11 +49,21 @@ def check_source(label: str, url: str, keywords: list[str]) -> dict:
             "reason": "network error",
         }
 
-    if text is None:
+    if text is None and status != 200:
         return {
             "label": label, "url": url, "status": status,
             "verdict": "FAIL", "keyword_hits": 0,
             "reason": f"HTTP {status}",
+        }
+
+    if text is None:
+        # status == 200 but no CONTENT_TAGS lines were extracted at all --
+        # same failure mode as zero keyword hits below, just occurring
+        # before we even get to count keywords (usually JS-rendered content).
+        return {
+            "label": label, "url": url, "status": status,
+            "verdict": "EMPTY", "keyword_hits": 0,
+            "reason": "no extractable content -- page may be JS-rendered",
         }
 
     hits = _count_keyword_hits(text, keywords)

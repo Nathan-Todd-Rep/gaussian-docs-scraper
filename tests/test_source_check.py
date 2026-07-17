@@ -24,6 +24,16 @@ def test_check_source_fail_on_non_200(monkeypatch):
     assert "403" in result["reason"]
 
 
+def test_check_source_empty_when_200_but_no_extractable_content(monkeypatch):
+    monkeypatch.setattr(source_check, "fetch_page_text", lambda url: (None, 200))
+
+    result = check_source("Example", "https://example.com", ["gaussian"])
+
+    assert result["verdict"] == "EMPTY"
+    assert result["status"] == 200
+    assert "JS-rendered" in result["reason"]
+
+
 def test_check_source_empty_when_no_keyword_matches(monkeypatch):
     monkeypatch.setattr(
         source_check, "fetch_page_text",
