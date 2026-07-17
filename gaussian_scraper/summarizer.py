@@ -8,15 +8,25 @@ OLLAMA_MODEL = "llama3"
 REQUEST_TIMEOUT_SEC = 30
 
 # Maximum number of passages to include in a single summarization prompt.
-# The extractor already ranks passages by relevance (first match wins),
-# so the top 5 are the most useful. Keeping prompts short improves
-# summary quality and reduces Ollama response time.
+# The extractor already ranks passages by keyword-match score, so the top
+# 5 are the most keyword-dense. Keeping prompts short improves summary
+# quality and reduces Ollama response time.
 MAX_PASSAGES_TO_SUMMARIZE = 5
 
+# This data feeds a scientific HPC assistant, so the prompt explicitly
+# forbids adding anything not present in the passages. A summary that
+# sounds confident but includes fabricated details (a made-up flag, a
+# wrong default value) is worse than no summary at all -- accuracy over
+# fluency is the priority here.
 _PROMPT_TEMPLATE = """\
-You are a concise technical assistant. Summarize the following passages from \
-{source} in 2-3 sentences. Focus on what a researcher \
-would find practically useful.
+You are a precise technical summarizer. Summarize ONLY the information \
+explicitly stated in the passages below, from {source}, in 2-3 sentences.
+
+Rules:
+- Do not add any fact, detail, or context that is not directly stated in the passages.
+- Do not rely on outside knowledge about this topic, even if you believe it to be correct.
+- If the passages do not contain enough information for a useful summary, say so plainly rather than guessing.
+- Focus on what a researcher would find practically useful (e.g. commands, settings, requirements).
 
 Passages:
 {passages}

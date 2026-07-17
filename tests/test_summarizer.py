@@ -103,6 +103,28 @@ def test_summarize_returns_none_on_empty_response_field(monkeypatch):
     assert result is None
 
 
+# --- anti-hallucination instructions ---
+
+def test_summarize_prompt_forbids_outside_information(monkeypatch):
+    captured_prompt = []
+
+    def fake_post(url, json=None, **kwargs):
+        captured_prompt.append(json.get("prompt", ""))
+        return SimpleNamespace(
+            status_code=200,
+            json=lambda: {"response": "A summary."},
+        )
+
+    monkeypatch.setattr(requests, "post", fake_post)
+
+    summarize_passages(SAMPLE_PASSAGES)
+
+    prompt = captured_prompt[0].lower()
+    assert "not directly stated in the passages" in prompt
+    assert "do not rely on outside knowledge" in prompt
+    assert "say so plainly rather than guessing" in prompt
+
+
 # --- passage cap ---
 
 def test_summarize_caps_passages_sent_to_ollama(monkeypatch):
