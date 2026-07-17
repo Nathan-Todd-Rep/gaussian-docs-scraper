@@ -22,6 +22,10 @@ url = "https://www.osc.edu/resources/available_software/software_list/gaussian"
 label = "HPC Wiki - Gaussian"
 url = "https://hpc-wiki.info/hpc/Gaussian"
 
+[[html_sources]]
+label = "CSC Finland - Gaussian"
+url = "https://docs.csc.fi/apps/gaussian/"
+
 [[se_sources]]
 label = "Matter Modeling Stack Exchange - gaussian tag"
 site = "mattermodeling"
@@ -46,3 +50,13 @@ tag = "quantum-chemistry"
 label = "Matter Modeling Stack Exchange - high-performance-computing tag"
 site = "mattermodeling"
 tag = "high-performance-computing"
+
+[[se_sources]]
+label = "Chemistry Stack Exchange - quantum-chemistry tag"
+site = "chemistry"
+tag = "quantum-chemistry"
+
+[[se_sources]]
+label = "Chemistry Stack Exchange - computational-chemistry tag"
+site = "chemistry"
+tag = "computational-chemistry"

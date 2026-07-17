@@ -49,6 +49,10 @@ GAUSSIAN_PRESET = {
             "label": "HPC Wiki - Gaussian",
             "url": "https://hpc-wiki.info/hpc/Gaussian",
         },
+        {
+            "label": "CSC Finland - Gaussian",
+            "url": "https://docs.csc.fi/apps/gaussian/",
+        },
     ],
     "se_sources": [
         {
@@ -75,6 +79,16 @@ GAUSSIAN_PRESET = {
             "label": "Matter Modeling Stack Exchange - high-performance-computing tag",
             "tag": "high-performance-computing",
             "site": "mattermodeling",
+        },
+        {
+            "label": "Chemistry Stack Exchange - quantum-chemistry tag",
+            "tag": "quantum-chemistry",
+            "site": "chemistry",
+        },
+        {
+            "label": "Chemistry Stack Exchange - computational-chemistry tag",
+            "tag": "computational-chemistry",
+            "site": "chemistry",
         },
     ],
 }
@@ -110,10 +124,6 @@ BIOINFORMATICS_PRESET = {
             "url": "https://www.osc.edu/resources/available_software/software_list/gatk",
         },
         {
-            "label": "Alliance Canada - Bioinformatics",
-            "url": "https://docs.alliancecan.ca/wiki/Bioinformatics",
-        },
-        {
             "label": "NIH HPC - Samtools",
             "url": "https://hpc.nih.gov/apps/samtools.html",
         },
@@ -146,6 +156,16 @@ BIOINFORMATICS_PRESET = {
         {
             "label": "Bioinformatics Stack Exchange - samtools tag",
             "tag": "samtools",
+            "site": "bioinformatics",
+        },
+        {
+            "label": "Bioinformatics Stack Exchange - fastq tag",
+            "tag": "fastq",
+            "site": "bioinformatics",
+        },
+        {
+            "label": "Bioinformatics Stack Exchange - assembly tag",
+            "tag": "assembly",
             "site": "bioinformatics",
         },
     ],

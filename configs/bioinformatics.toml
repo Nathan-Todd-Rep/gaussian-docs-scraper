@@ -15,10 +15,6 @@ label = "Ohio Supercomputer Center - GATK"
 url = "https://www.osc.edu/resources/available_software/software_list/gatk"
 
 [[html_sources]]
-label = "Alliance Canada - Bioinformatics"
-url = "https://docs.alliancecan.ca/wiki/Bioinformatics"
-
-[[html_sources]]
 label = "NIH HPC - Samtools"
 url = "https://hpc.nih.gov/apps/samtools.html"
 
@@ -50,3 +46,13 @@ tag = "genome"
 label = "Bioinformatics Stack Exchange - samtools tag"
 site = "bioinformatics"
 tag = "samtools"
+
+[[se_sources]]
+label = "Bioinformatics Stack Exchange - fastq tag"
+site = "bioinformatics"
+tag = "fastq"
+
+[[se_sources]]
+label = "Bioinformatics Stack Exchange - assembly tag"
+site = "bioinformatics"
+tag = "assembly"
