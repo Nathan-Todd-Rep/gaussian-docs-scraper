@@ -21,6 +21,7 @@ import sys
 from pathlib import Path
 
 from gaussian_scraper.config import ScraperConfig, load_toml_config
+from gaussian_scraper.dedup import dedupe_across_sources
 from gaussian_scraper.extractor import extract_relevant_passages
 from gaussian_scraper.fetcher import fetch_page_text
 from gaussian_scraper.sources import GAUSSIAN_KEYWORDS, GAUSSIAN_SOURCES, STACKEXCHANGE_SOURCES
@@ -170,6 +171,14 @@ def run_scrape(config: ScraperConfig) -> None:
         print("\nNo results collected. Check network access or source URLs.")
         return
 
+    results, duplicates_removed = dedupe_across_sources(results)
+    if duplicates_removed:
+        print(f"\nRemoved {duplicates_removed} duplicate passage(s) shared across sources.")
+
+    if not results:
+        print("\nNo results remain after deduplication.")
+        return
+
     summarize_results(results)
     save_results(results, config.output_path)
     total_passages = sum(len(r["passages"]) for r in results)
@@ -195,7 +204,13 @@ def main() -> None:
     # terminal, so automated/piped runs (CI, scripts) never hang waiting
     # for a keypress that will never come.
     if sys.stdin.isatty():
-        input("\nPress Enter to exit...")
+        try:
+            input("\nPress Enter to exit...")
+        except EOFError:
+            # Some terminal environments report isatty() as True without
+            # actually having readable stdin attached. Don't crash on exit
+            # just because the pause couldn't be shown.
+            pass
 
 
 if __name__ == "__main__":

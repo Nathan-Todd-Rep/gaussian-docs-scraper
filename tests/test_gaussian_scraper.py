@@ -60,6 +60,19 @@ def test_extract_caps_results_at_max_passages(monkeypatch):
     assert len(results) == 3
 
 
+def test_extract_deduplicates_repeated_lines():
+    text = "\n".join([
+        "Load the Gaussian module before submitting your job.",
+        "Use %mem and %nproc in your Gaussian input file for resources.",
+        "Load the Gaussian module before submitting your job.",
+    ])
+
+    results = extract_relevant_passages(text, keywords=["gaussian"])
+
+    assert len(results) == 2
+    assert results.count("Load the Gaussian module before submitting your job.") == 1
+
+
 # --- fetcher tests ---
 
 def test_fetch_returns_none_on_request_error(monkeypatch):

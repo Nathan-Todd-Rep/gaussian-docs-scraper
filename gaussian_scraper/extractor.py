@@ -19,18 +19,23 @@ def extract_relevant_passages(text: str, keywords: list[str] | None = None) -> l
     - they are long enough to be meaningful
     - they contain at least one keyword (case-insensitive)
 
+    Exact-duplicate lines (e.g. a module listing table that appears twice
+    in a page's raw HTML) are only kept once, so the cap isn't wasted on
+    repeated content.
+
     Args:
         text: Raw text returned by fetch_page_text().
         keywords: List of keywords to filter by. Defaults to GAUSSIAN_KEYWORDS.
 
     Returns:
-        A list of relevant passage strings, capped at MAX_PASSAGES_PER_SOURCE.
+        A list of unique, relevant passage strings, capped at MAX_PASSAGES_PER_SOURCE.
     """
     if keywords is None:
         keywords = GAUSSIAN_KEYWORDS
 
     lower_keywords = [kw.lower() for kw in keywords]
     passages = []
+    seen = set()
 
     for line in text.splitlines():
         stripped = line.strip()
@@ -39,7 +44,8 @@ def extract_relevant_passages(text: str, keywords: list[str] | None = None) -> l
             continue
 
         lower_line = stripped.lower()
-        if any(kw in lower_line for kw in lower_keywords):
+        if any(kw in lower_line for kw in lower_keywords) and stripped not in seen:
+            seen.add(stripped)
             passages.append(stripped)
 
         if len(passages) >= MAX_PASSAGES_PER_SOURCE:

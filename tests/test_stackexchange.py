@@ -144,6 +144,37 @@ def test_fetch_se_caps_at_max_passages(monkeypatch):
     assert len(result) == 3
 
 
+# --- deduplication ---
+
+def test_fetch_se_deduplicates_repeated_lines(monkeypatch):
+    duplicated_line = "Use Gaussian g16 with %mem=8GB and %nproc=4 on the cluster for this job."
+    questions = [
+        {
+            "question_id": 1,
+            "title": "Short title one",
+            "body": f"<p>{duplicated_line}</p>",
+            "score": 10,
+        },
+        {
+            "question_id": 2,
+            "title": "Short title two",
+            "body": f"<p>{duplicated_line}</p>",
+            "score": 9,
+        },
+    ]
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        _make_fake_get({"items": questions}),
+    )
+
+    result = fetch_se_passages(tag="gaussian", site="chemistry")
+
+    assert result is not None
+    assert result.count(duplicated_line) == 1
+
+
 # --- answer passage extraction ---
 
 def test_fetch_se_includes_answer_passages(monkeypatch):

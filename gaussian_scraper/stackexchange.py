@@ -83,6 +83,10 @@ def fetch_se_passages(
     - Lines from the question body, filtered the same way as HTML page text
     - Lines from the top answers to those questions
 
+    Exact-duplicate lines (e.g. a question's title repeated verbatim in its
+    body, or a boilerplate line reused across answers) are only kept once
+    across the whole call, so the cap isn't wasted on repeated content.
+
     Returns None if the questions request fails. Returns an empty list if
     the request succeeds but no relevant passages are found.
     """
@@ -116,6 +120,7 @@ def fetch_se_passages(
         return None
 
     passages = []
+    seen = set()
     question_ids = []
 
     for question in data.get("items", []):
@@ -130,7 +135,9 @@ def fetch_se_passages(
         if (
             len(title) >= MIN_PASSAGE_LENGTH
             and any(kw in title.lower() for kw in lower_keywords)
+            and title not in seen
         ):
+            seen.add(title)
             passages.append(title)
             if len(passages) >= MAX_PASSAGES_PER_SOURCE:
                 continue
@@ -139,7 +146,8 @@ def fetch_se_passages(
             stripped = line.strip()
             if len(stripped) < MIN_PASSAGE_LENGTH:
                 continue
-            if any(kw in stripped.lower() for kw in lower_keywords):
+            if any(kw in stripped.lower() for kw in lower_keywords) and stripped not in seen:
+                seen.add(stripped)
                 passages.append(stripped)
             if len(passages) >= MAX_PASSAGES_PER_SOURCE:
                 break
@@ -150,7 +158,8 @@ def fetch_se_passages(
                 stripped = line.strip()
                 if len(stripped) < MIN_PASSAGE_LENGTH:
                     continue
-                if any(kw in stripped.lower() for kw in lower_keywords):
+                if any(kw in stripped.lower() for kw in lower_keywords) and stripped not in seen:
+                    seen.add(stripped)
                     passages.append(stripped)
                 if len(passages) >= MAX_PASSAGES_PER_SOURCE:
                     return passages
