@@ -3,7 +3,7 @@ from __future__ import annotations
 import requests
 from bs4 import BeautifulSoup
 
-from gaussian_scraper.extractor import MAX_PASSAGES_PER_SOURCE, MIN_PASSAGE_LENGTH
+from gaussian_scraper.extractor import MAX_PASSAGES_PER_SOURCE, MIN_PASSAGE_LENGTH, score_passage
 from gaussian_scraper.sources import GAUSSIAN_KEYWORDS
 
 SE_API_BASE = "https://api.stackexchange.com/2.3"
@@ -21,8 +21,29 @@ DEFAULT_DISCOVERY_SITES = [
 MAX_DISCOVERY_RESULTS = 10
 
 
+# Block-level tags used to split an SE body into separate lines. Using
+# block boundaries (rather than every tag boundary) keeps inline formatting
+# like <strong> and <code> merged within their parent sentence, while still
+# giving the extractor real paragraph/sentence granularity to score --
+# instead of collapsing an entire multi-paragraph answer into one giant
+# single-line passage.
+_BODY_BLOCK_TAGS = ["p", "li", "pre", "blockquote"]
+
+
 def _strip_html(html: str) -> str:
-    return BeautifulSoup(html, "html.parser").get_text(separator=" ", strip=True)
+    """Convert an SE question/answer HTML body into plain text, one line per block element."""
+    soup = BeautifulSoup(html, "html.parser")
+    lines = [
+        text for tag in soup.find_all(_BODY_BLOCK_TAGS)
+        if (text := tag.get_text(separator=" ", strip=True))
+    ]
+
+    if lines:
+        return "\n".join(lines)
+
+    # Fallback for bodies with no block-level tags at all (rare, but
+    # avoids silently losing content if the HTML is unusually flat).
+    return soup.get_text(separator=" ", strip=True)
 
 
 def _fetch_answer_bodies(question_ids: list[int], site: str) -> list[str]:
@@ -78,14 +99,19 @@ def fetch_se_passages(
     Fetch top-voted questions and their answers from a Stack Exchange site
     by tag and return relevant passages.
 
-    Each question contributes passages from:
+    Each question contributes candidate passages from:
     - The question title, if it contains a keyword
     - Lines from the question body, filtered the same way as HTML page text
     - Lines from the top answers to those questions
 
-    Exact-duplicate lines (e.g. a question's title repeated verbatim in its
-    body, or a boilerplate line reused across answers) are only kept once
-    across the whole call, so the cap isn't wasted on repeated content.
+    Answers are always fetched (not skipped once the question-level content
+    fills the cap) so a highly relevant answer isn't excluded in favor of a
+    weaker question-body line just because it was seen first.
+
+    All candidates are pooled together, exact-duplicate lines are only
+    considered once, and the highest keyword-scoring candidates are kept
+    up to MAX_PASSAGES_PER_SOURCE (see extractor.score_passage). Ties keep
+    their original document order.
 
     Returns None if the questions request fails. Returns an empty list if
     the request succeeds but no relevant passages are found.
@@ -119,50 +145,35 @@ def fetch_se_passages(
     except ValueError:
         return None
 
-    passages = []
+    candidates = []
     seen = set()
     question_ids = []
+
+    def _consider(line: str) -> None:
+        stripped = line.strip()
+        if len(stripped) < MIN_PASSAGE_LENGTH or stripped in seen:
+            return
+        score = score_passage(stripped, lower_keywords)
+        if score > 0:
+            seen.add(stripped)
+            candidates.append((score, stripped))
 
     for question in data.get("items", []):
         question_ids.append(question.get("question_id"))
 
-        if len(passages) >= MAX_PASSAGES_PER_SOURCE:
-            continue
+        _consider(question.get("title", ""))
 
-        title = question.get("title", "")
         body_text = _strip_html(question.get("body", ""))
-
-        if (
-            len(title) >= MIN_PASSAGE_LENGTH
-            and any(kw in title.lower() for kw in lower_keywords)
-            and title not in seen
-        ):
-            seen.add(title)
-            passages.append(title)
-            if len(passages) >= MAX_PASSAGES_PER_SOURCE:
-                continue
-
         for line in body_text.splitlines():
-            stripped = line.strip()
-            if len(stripped) < MIN_PASSAGE_LENGTH:
-                continue
-            if any(kw in stripped.lower() for kw in lower_keywords) and stripped not in seen:
-                seen.add(stripped)
-                passages.append(stripped)
-            if len(passages) >= MAX_PASSAGES_PER_SOURCE:
-                break
+            _consider(line)
 
-    if question_ids and len(passages) < MAX_PASSAGES_PER_SOURCE:
+    if question_ids:
         for body_text in _fetch_answer_bodies(question_ids, site):
             for line in body_text.splitlines():
-                stripped = line.strip()
-                if len(stripped) < MIN_PASSAGE_LENGTH:
-                    continue
-                if any(kw in stripped.lower() for kw in lower_keywords) and stripped not in seen:
-                    seen.add(stripped)
-                    passages.append(stripped)
-                if len(passages) >= MAX_PASSAGES_PER_SOURCE:
-                    return passages
+                _consider(line)
+
+    candidates.sort(key=lambda c: c[0], reverse=True)
+    passages = [passage for _, passage in candidates[:MAX_PASSAGES_PER_SOURCE]]
 
     return passages if passages else None
 

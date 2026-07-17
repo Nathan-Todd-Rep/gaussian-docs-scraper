@@ -73,6 +73,35 @@ def test_extract_deduplicates_repeated_lines():
     assert results.count("Load the Gaussian module before submitting your job.") == 1
 
 
+def test_extract_prioritizes_higher_scoring_passages_when_over_cap(monkeypatch):
+    monkeypatch.setattr(extractor, "MAX_PASSAGES_PER_SOURCE", 1)
+
+    weak_line = "Gaussian is mentioned here once and nothing else relevant."
+    strong_line = "Use Gaussian with slurm sbatch and %mem settings for the job."
+
+    # Weak line appears first in the document -- under the old first-match
+    # behavior it would win the single cap slot. Scoring should prefer the
+    # line that matches more keywords instead.
+    text = "\n".join([weak_line, strong_line])
+
+    results = extract_relevant_passages(
+        text, keywords=["gaussian", "slurm", "sbatch", "%mem"]
+    )
+
+    assert results == [strong_line]
+
+
+def test_extract_preserves_document_order_for_equal_scores():
+    line_a = "Gaussian job number one for this test case here."
+    line_b = "Gaussian job number two for this test case here."
+
+    text = "\n".join([line_a, line_b])
+
+    results = extract_relevant_passages(text, keywords=["gaussian"])
+
+    assert results == [line_a, line_b]
+
+
 # --- fetcher tests ---
 
 def test_fetch_returns_none_on_request_error(monkeypatch):

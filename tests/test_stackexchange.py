@@ -119,6 +119,35 @@ def test_fetch_se_strips_html_from_body(monkeypatch):
     assert any("%mem" in p or "Gaussian" in p for p in result)
 
 
+def test_fetch_se_body_splits_into_separate_paragraph_passages(monkeypatch):
+    question = {
+        "question_id": 3,
+        "title": "Short title",
+        "body": (
+            "<p>Use %mem=8GB and %nproc=4 in your Gaussian input file for the job.</p>"
+            "<p>Also remember to load the gaussian module before submitting via slurm.</p>"
+        ),
+        "score": 1,
+    }
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        _make_fake_get({"items": [question]}),
+    )
+
+    result = fetch_se_passages(
+        tag="gaussian", site="chemistry",
+        keywords=["gaussian", "%mem", "%nproc", "slurm"],
+    )
+
+    assert result is not None
+    # The two <p> tags should become two distinct passages, not one
+    # giant blob with both sentences merged together.
+    assert any(p.startswith("Use %mem=8GB") and "Also remember" not in p for p in result)
+    assert any(p.startswith("Also remember") for p in result)
+
+
 def test_fetch_se_caps_at_max_passages(monkeypatch):
     monkeypatch.setattr(stackexchange, "MAX_PASSAGES_PER_SOURCE", 3)
 
@@ -142,6 +171,73 @@ def test_fetch_se_caps_at_max_passages(monkeypatch):
 
     assert result is not None
     assert len(result) == 3
+
+
+# --- scoring / prioritization ---
+
+def test_fetch_se_prioritizes_higher_scoring_passages_when_over_cap(monkeypatch):
+    monkeypatch.setattr(stackexchange, "MAX_PASSAGES_PER_SOURCE", 1)
+
+    weak_line = "Gaussian is mentioned here once and nothing else relevant at all."
+    strong_line = "Use Gaussian with slurm sbatch and %mem settings for the job today."
+
+    question = {
+        "question_id": 1,
+        "title": "Short title",
+        # weak line appears first in the body -- under the old first-match
+        # behavior it would have won the single cap slot.
+        "body": f"<p>{weak_line}</p><p>{strong_line}</p>",
+        "score": 10,
+    }
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        _make_fake_get({"items": [question]}),
+    )
+
+    result = fetch_se_passages(
+        tag="gaussian", site="chemistry",
+        keywords=["gaussian", "slurm", "sbatch", "%mem"],
+    )
+
+    assert result == [strong_line]
+
+
+def test_fetch_se_always_fetches_answers_even_when_cap_already_met(monkeypatch):
+    monkeypatch.setattr(stackexchange, "MAX_PASSAGES_PER_SOURCE", 1)
+
+    question = {
+        "question_id": 1,
+        "title": "How do I use Gaussian g16 for a calculation on the cluster today?",
+        "body": "<p>Some unrelated body text that still mentions gaussian once here.</p>",
+        "score": 10,
+    }
+    # The answer is more keyword-dense than the question title, so it
+    # should win the single cap slot -- but only if it was actually fetched.
+    answer = {
+        "answer_id": 100,
+        "question_id": 1,
+        "body": "<p>Use Gaussian g16 with slurm sbatch and %mem plus %nproc settings.</p>",
+        "score": 5,
+    }
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        _make_fake_get(
+            questions_data={"items": [question]},
+            answers_data={"items": [answer]},
+        ),
+    )
+
+    result = fetch_se_passages(
+        tag="gaussian", site="chemistry",
+        keywords=["gaussian", "slurm", "sbatch", "%mem", "%nproc"],
+    )
+
+    assert result is not None
+    assert "slurm sbatch and %mem plus %nproc" in result[0]
 
 
 # --- deduplication ---
