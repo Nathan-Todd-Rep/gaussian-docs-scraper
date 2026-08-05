@@ -212,6 +212,10 @@ def run_wizard(
         html_sources = _prompt_html_sources(input_func, print_func)
         keywords = _prompt_keywords([], input_func, print_func)
 
+    while not keywords:
+        print_func("\nAt least one keyword is required so results can be filtered.")
+        keywords = _prompt_keywords([], input_func, print_func)
+
     while not html_sources and not se_sources:
         print_func("\nNo sources selected. Please add at least one tag or URL.")
         se_sources += _prompt_se_tags(name, input_func, print_func)

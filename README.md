@@ -27,13 +27,30 @@ pip install requests beautifulsoup4
 
 ## Usage
 
-Run the scraper to refresh the data:
+Run the scraper and follow the prompts -- no command-line experience needed:
 
 ```bash
 py scrape.py
 ```
 
-Output is saved to `~/.inkly/gaussian_docs.json`. The Inkly `docs_gaussian` plugin reads from this file automatically at runtime.
+The wizard asks what to scrape (a built-in preset or a custom topic), lets you
+add extra sources, and saves the result for Inkly to read. Output defaults to
+`~/.inkly/{name}_docs.json`; the Inkly `docs_gaussian` plugin reads the
+Gaussian file automatically at runtime.
+
+Already have a config from a previous run? See what's saved with:
+
+```bash
+py scrape.py --list-configs
+```
+
+and re-run one without going through the wizard again with:
+
+```bash
+py scrape.py --config configs/gaussian.toml
+```
+
+Run `py scrape.py --help` for the full option list with examples.
 
 ---
 

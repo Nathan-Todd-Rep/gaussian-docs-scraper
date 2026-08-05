@@ -120,6 +120,28 @@ def test_wizard_custom_topic_flow(monkeypatch):
     ]
 
 
+def test_wizard_retries_when_no_keywords_entered(monkeypatch):
+    monkeypatch.setattr(wizard, "discover_se_tags", lambda topic, sites=None: [])
+
+    inputs = [
+        "3",                        # custom topic
+        "gaussian",                 # topic
+        "y",                        # add a website
+        "https://example.com",
+        "Ex",
+        "n",                        # stop adding websites
+        "",                         # blank keywords (first attempt)
+        "gaussian, dft",            # keywords (retry)
+        "n",                        # decline save
+    ]
+    input_func, print_func, printed = _fake_io(inputs)
+
+    config = run_wizard(input_func=input_func, print_func=print_func)
+
+    assert config.keywords == ["gaussian", "dft"]
+    assert any("At least one keyword is required" in line for line in printed)
+
+
 def test_wizard_retries_when_no_sources_selected(monkeypatch):
     monkeypatch.setattr(wizard, "discover_se_tags", lambda topic, sites=None: [])
 

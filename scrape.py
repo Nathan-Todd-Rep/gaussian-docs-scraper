@@ -9,9 +9,12 @@ result to ~/.inkly/{name}_docs.json for Inkly to read at runtime.
 Usage:
 
     py scrape.py                        # launches the interactive setup wizard
+    py scrape.py --list-configs         # shows configs you've already saved
     py scrape.py --config gaussian.toml # runs a saved config, no prompts
     py scrape.py --legacy               # uses the original hardcoded Gaussian
                                          # sources in sources.py as a fallback
+
+Run "py scrape.py --help" for the full option list with examples.
 """
 from __future__ import annotations
 
@@ -20,7 +23,7 @@ import json
 import sys
 from pathlib import Path
 
-from gaussian_scraper.config import ScraperConfig, load_toml_config
+from gaussian_scraper.config import ConfigError, ScraperConfig, load_toml_config
 from gaussian_scraper.dedup import dedupe_across_sources
 from gaussian_scraper.extractor import extract_relevant_passages
 from gaussian_scraper.fetcher import fetch_page_text
@@ -28,6 +31,10 @@ from gaussian_scraper.sources import GAUSSIAN_KEYWORDS, GAUSSIAN_SOURCES, STACKE
 from gaussian_scraper.stackexchange import fetch_se_passages
 from gaussian_scraper.summarizer import is_ollama_available, summarize_passages
 from gaussian_scraper.wizard import run_wizard
+
+# Directory the wizard offers by default when saving configs; also where
+# --list-configs looks, so users never need to know or type a path.
+CONFIG_DIR = Path("configs")
 
 
 def scrape_html_sources(html_sources: list[dict], keywords: list[str]) -> list[dict]:
@@ -140,19 +147,60 @@ def build_legacy_config() -> ScraperConfig:
     ).validate()
 
 
+def list_configs(config_dir: Path) -> None:
+    """Print the saved TOML configs in config_dir, so users don't need to know file paths."""
+    if not config_dir.is_dir():
+        print(f"No configs found -- '{config_dir}' does not exist yet.")
+        return
+
+    toml_files = sorted(config_dir.glob("*.toml"))
+    if not toml_files:
+        print(f"No saved configs in '{config_dir}' yet. Run 'py scrape.py' to create one.")
+        return
+
+    print(f"Saved configs in '{config_dir}':\n")
+    for path in toml_files:
+        try:
+            config = load_toml_config(path)
+            source_count = len(config.html_sources) + len(config.se_sources)
+            print(f"  {path.name:<30} {config.name} -- {source_count} source(s), "
+                  f"{len(config.keywords)} keyword(s)")
+        except ConfigError as e:
+            print(f"  {path.name:<30} INVALID -- {e}")
+    print(f"\nRun a saved config with: py scrape.py --config {config_dir}/<name>.toml")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Domain-agnostic HPC documentation scraper.",
+        description="Domain-agnostic HPC documentation scraper for Inkly. "
+                     "Collects HPC/research documentation and Stack Exchange "
+                     "passages for a topic and saves them for Inkly to read.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "examples:\n"
+            "  py scrape.py                          run the guided setup wizard (recommended --\n"
+            "                                        no prior config needed, just answer prompts)\n"
+            "  py scrape.py --list-configs           show configs you've already saved\n"
+            "  py scrape.py --config configs/gaussian.toml\n"
+            "                                        re-run a saved config with no prompts\n"
+            "  py scrape.py --legacy                 use the original built-in Gaussian sources\n"
+        ),
     )
     parser.add_argument(
         "--config",
         type=str,
-        help="Path to a TOML scraper config. Skips the interactive wizard.",
+        metavar="PATH",
+        help="Path to a saved TOML config (see --list-configs). Skips the wizard.",
     )
     parser.add_argument(
         "--legacy",
         action="store_true",
-        help="Use the original hardcoded Gaussian sources instead of the config system.",
+        help="Use the original built-in Gaussian sources instead of the config system.",
+    )
+    parser.add_argument(
+        "--list-configs",
+        action="store_true",
+        help="List saved configs in the configs/ folder and exit.",
     )
     return parser.parse_args()
 
@@ -188,14 +236,22 @@ def run_scrape(config: ScraperConfig) -> None:
 def main() -> None:
     args = parse_args()
 
-    if args.legacy:
-        config = build_legacy_config()
-    elif args.config:
-        config = load_toml_config(Path(args.config))
+    if args.list_configs:
+        list_configs(CONFIG_DIR)
     else:
-        config = run_wizard()
+        try:
+            if args.legacy:
+                config = build_legacy_config()
+            elif args.config:
+                config = load_toml_config(Path(args.config))
+            else:
+                config = run_wizard()
 
-    run_scrape(config)
+            run_scrape(config)
+        except ConfigError as e:
+            print(f"\nConfig problem: {e}")
+        except KeyboardInterrupt:
+            print("\nCancelled.")
 
     # If launched by double-clicking rather than from an already-open
     # terminal, Windows closes the console the instant the script exits --
