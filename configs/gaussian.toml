@@ -26,6 +26,38 @@ url = "https://hpc-wiki.info/hpc/Gaussian"
 label = "CSC Finland - Gaussian"
 url = "https://docs.csc.fi/apps/gaussian/"
 
+[[html_sources]]
+label = "U Florida RC - Gaussian"
+url = "https://docs.rc.ufl.edu/software/apps/gaussian"
+
+[[html_sources]]
+label = "U Chicago RCC - Gaussian"
+url = "https://docs.rcc.uchicago.edu/software/apps-and-envs/gaussian/"
+
+[[html_sources]]
+label = "Yale YCRC - Gaussian"
+url = "https://docs.ycrc.yale.edu/clusters-at-yale/guides/gaussian"
+
+[[html_sources]]
+label = "FSU RCC - Gaussian"
+url = "https://docs.rcc.fsu.edu/software/gaussian/"
+
+[[html_sources]]
+label = "Utah CHPC - Gaussian09"
+url = "https://www.chpc.utah.edu/documentation/software/gaussian09.php"
+
+[[html_sources]]
+label = "Utah CHPC - Gaussian16"
+url = "https://www.chpc.utah.edu/documentation/software/gaussian16/index.php"
+
+[[html_sources]]
+label = "NC State HPC - Gaussian"
+url = "https://hpc.ncsu.edu/Software/Apps.php?app=Gaussian"
+
+[[html_sources]]
+label = "GWDG - Gaussian"
+url = "https://docs.hpc.gwdg.de/software_stacks/applications/gaussian/index.html"
+
 [[se_sources]]
 label = "Matter Modeling Stack Exchange - gaussian tag"
 site = "mattermodeling"
@@ -60,3 +92,23 @@ tag = "quantum-chemistry"
 label = "Chemistry Stack Exchange - computational-chemistry tag"
 site = "chemistry"
 tag = "computational-chemistry"
+
+[[se_sources]]
+label = "Matter Modeling Stack Exchange - basis-sets tag"
+site = "mattermodeling"
+tag = "basis-sets"
+
+[[se_sources]]
+label = "Chemistry Stack Exchange - basis-set tag"
+site = "chemistry"
+tag = "basis-set"
+
+[[se_sources]]
+label = "Matter Modeling Stack Exchange - td-dft tag"
+site = "mattermodeling"
+tag = "td-dft"
+
+[[se_sources]]
+label = "SciComp Stack Exchange - hpc tag"
+site = "scicomp"
+tag = "hpc"

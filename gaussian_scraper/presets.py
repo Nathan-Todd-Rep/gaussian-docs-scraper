@@ -53,6 +53,38 @@ GAUSSIAN_PRESET = {
             "label": "CSC Finland - Gaussian",
             "url": "https://docs.csc.fi/apps/gaussian/",
         },
+        {
+            "label": "U Florida RC - Gaussian",
+            "url": "https://docs.rc.ufl.edu/software/apps/gaussian",
+        },
+        {
+            "label": "U Chicago RCC - Gaussian",
+            "url": "https://docs.rcc.uchicago.edu/software/apps-and-envs/gaussian/",
+        },
+        {
+            "label": "Yale YCRC - Gaussian",
+            "url": "https://docs.ycrc.yale.edu/clusters-at-yale/guides/gaussian",
+        },
+        {
+            "label": "FSU RCC - Gaussian",
+            "url": "https://docs.rcc.fsu.edu/software/gaussian/",
+        },
+        {
+            "label": "Utah CHPC - Gaussian09",
+            "url": "https://www.chpc.utah.edu/documentation/software/gaussian09.php",
+        },
+        {
+            "label": "Utah CHPC - Gaussian16",
+            "url": "https://www.chpc.utah.edu/documentation/software/gaussian16/index.php",
+        },
+        {
+            "label": "NC State HPC - Gaussian",
+            "url": "https://hpc.ncsu.edu/Software/Apps.php?app=Gaussian",
+        },
+        {
+            "label": "GWDG - Gaussian",
+            "url": "https://docs.hpc.gwdg.de/software_stacks/applications/gaussian/index.html",
+        },
     ],
     "se_sources": [
         {
@@ -89,6 +121,26 @@ GAUSSIAN_PRESET = {
             "label": "Chemistry Stack Exchange - computational-chemistry tag",
             "tag": "computational-chemistry",
             "site": "chemistry",
+        },
+        {
+            "label": "Matter Modeling Stack Exchange - basis-sets tag",
+            "tag": "basis-sets",
+            "site": "mattermodeling",
+        },
+        {
+            "label": "Chemistry Stack Exchange - basis-set tag",
+            "tag": "basis-set",
+            "site": "chemistry",
+        },
+        {
+            "label": "Matter Modeling Stack Exchange - td-dft tag",
+            "tag": "td-dft",
+            "site": "mattermodeling",
+        },
+        {
+            "label": "SciComp Stack Exchange - hpc tag",
+            "tag": "hpc",
+            "site": "scicomp",
         },
     ],
 }
@@ -131,6 +183,26 @@ BIOINFORMATICS_PRESET = {
             "label": "NIH HPC - BWA",
             "url": "https://hpc.nih.gov/apps/bwa.html",
         },
+        {
+            "label": "Utah CHPC - BLAST",
+            "url": "https://www.chpc.utah.edu/documentation/software/blast.php",
+        },
+        {
+            "label": "QMUL HPC - GATK",
+            "url": "https://docs.hpc.qmul.ac.uk/apps/bio/gatk/",
+        },
+        {
+            "label": "UL HPC - Bioinformatics Basics",
+            "url": "https://ulhpc-tutorials.readthedocs.io/en/latest/bio/basics/",
+        },
+        {
+            "label": "GATK - Local HPC Infrastructure",
+            "url": "https://gatk.broadinstitute.org/hc/en-us/articles/360046877112-GATK-on-local-HPC-infrastructure",
+        },
+        {
+            "label": "Cornell BioHPC - Software Guide",
+            "url": "https://biohpc.cornell.edu/lab/userguide.aspx?a=software&i=445",
+        },
     ],
     "se_sources": [
         {
@@ -166,6 +238,26 @@ BIOINFORMATICS_PRESET = {
         {
             "label": "Bioinformatics Stack Exchange - assembly tag",
             "tag": "assembly",
+            "site": "bioinformatics",
+        },
+        {
+            "label": "Bioinformatics Stack Exchange - variant-calling tag",
+            "tag": "variant-calling",
+            "site": "bioinformatics",
+        },
+        {
+            "label": "Bioinformatics Stack Exchange - blast tag",
+            "tag": "blast",
+            "site": "bioinformatics",
+        },
+        {
+            "label": "Bioinformatics Stack Exchange - multiple-sequence-alignment tag",
+            "tag": "multiple-sequence-alignment",
+            "site": "bioinformatics",
+        },
+        {
+            "label": "Bioinformatics Stack Exchange - gatk tag",
+            "tag": "gatk",
             "site": "bioinformatics",
         },
     ],

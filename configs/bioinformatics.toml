@@ -22,6 +22,26 @@ url = "https://hpc.nih.gov/apps/samtools.html"
 label = "NIH HPC - BWA"
 url = "https://hpc.nih.gov/apps/bwa.html"
 
+[[html_sources]]
+label = "Utah CHPC - BLAST"
+url = "https://www.chpc.utah.edu/documentation/software/blast.php"
+
+[[html_sources]]
+label = "QMUL HPC - GATK"
+url = "https://docs.hpc.qmul.ac.uk/apps/bio/gatk/"
+
+[[html_sources]]
+label = "UL HPC - Bioinformatics Basics"
+url = "https://ulhpc-tutorials.readthedocs.io/en/latest/bio/basics/"
+
+[[html_sources]]
+label = "GATK - Local HPC Infrastructure"
+url = "https://gatk.broadinstitute.org/hc/en-us/articles/360046877112-GATK-on-local-HPC-infrastructure"
+
+[[html_sources]]
+label = "Cornell BioHPC - Software Guide"
+url = "https://biohpc.cornell.edu/lab/userguide.aspx?a=software&i=445"
+
 [[se_sources]]
 label = "Bioinformatics Stack Exchange - rna-seq tag"
 site = "bioinformatics"
@@ -56,3 +76,23 @@ tag = "fastq"
 label = "Bioinformatics Stack Exchange - assembly tag"
 site = "bioinformatics"
 tag = "assembly"
+
+[[se_sources]]
+label = "Bioinformatics Stack Exchange - variant-calling tag"
+site = "bioinformatics"
+tag = "variant-calling"
+
+[[se_sources]]
+label = "Bioinformatics Stack Exchange - blast tag"
+site = "bioinformatics"
+tag = "blast"
+
+[[se_sources]]
+label = "Bioinformatics Stack Exchange - multiple-sequence-alignment tag"
+site = "bioinformatics"
+tag = "multiple-sequence-alignment"
+
+[[se_sources]]
+label = "Bioinformatics Stack Exchange - gatk tag"
+site = "bioinformatics"
+tag = "gatk"
