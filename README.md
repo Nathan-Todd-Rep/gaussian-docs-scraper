@@ -69,6 +69,23 @@ If Ollama is not running, the scraper falls back to storing raw passages, no set
 
 ---
 
+## Searching Scraped Passages by Relevance
+
+Once a domain has been scraped, its passages can be ranked against a
+question instead of read in full:
+
+```bash
+py search_docs.py --domain gaussian --query "how do I request memory for a job?"
+```
+
+This is the retrieval half of a RAG-style pipeline: it scores every scraped
+passage for a domain against the query (TF-IDF + cosine similarity, no
+external ML dependency) and returns only the top few, so a consumer never
+needs to load the entire scraped dataset to answer one question. See
+`gaussian_scraper/passage_index.py`.
+
+---
+
 ## Output Format
 
 Each entry in `gaussian_docs.json` looks like this:
