@@ -4,7 +4,6 @@ import requests
 from bs4 import BeautifulSoup
 
 from gaussian_scraper.extractor import MAX_PASSAGES_PER_SOURCE, MIN_PASSAGE_LENGTH, score_passage
-from gaussian_scraper.sources import GAUSSIAN_KEYWORDS
 
 SE_API_BASE = "https://api.stackexchange.com/2.3"
 REQUEST_TIMEOUT_SEC = 10
@@ -91,9 +90,9 @@ def _fetch_answer_bodies(question_ids: list[int], site: str) -> list[str]:
 
 def fetch_se_passages(
     tag: str,
+    keywords: list[str],
     site: str = "chemistry",
     max_questions: int = 20,
-    keywords: list[str] | None = None,
 ) -> list[str] | None:
     """
     Fetch top-voted questions and their answers from a Stack Exchange site
@@ -113,12 +112,12 @@ def fetch_se_passages(
     up to MAX_PASSAGES_PER_SOURCE (see extractor.score_passage). Ties keep
     their original document order.
 
+    Args:
+        keywords: List of keywords to filter by, from the active domain's config.
+
     Returns None if the questions request fails. Returns an empty list if
     the request succeeds but no relevant passages are found.
     """
-    if keywords is None:
-        keywords = GAUSSIAN_KEYWORDS
-
     lower_keywords = [kw.lower() for kw in keywords]
 
     try:

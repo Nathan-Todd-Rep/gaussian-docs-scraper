@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from gaussian_scraper.sources import GAUSSIAN_KEYWORDS
-
 # Maximum number of passages to keep from a single page.
 # Keeps stored snippets focused and avoids flooding the plugin context.
 MAX_PASSAGES_PER_SOURCE = 30
@@ -23,7 +21,7 @@ def score_passage(passage: str, lower_keywords: list[str]) -> int:
     return sum(1 for kw in lower_keywords if kw in lower_passage)
 
 
-def extract_relevant_passages(text: str, keywords: list[str] | None = None) -> list[str]:
+def extract_relevant_passages(text: str, keywords: list[str]) -> list[str]:
     """
     Extract the most keyword-dense passages from raw page text.
 
@@ -42,14 +40,11 @@ def extract_relevant_passages(text: str, keywords: list[str] | None = None) -> l
 
     Args:
         text: Raw text returned by fetch_page_text().
-        keywords: List of keywords to filter by. Defaults to GAUSSIAN_KEYWORDS.
+        keywords: List of keywords to filter by, from the active domain's config.
 
     Returns:
         A list of unique, relevant passage strings, capped at MAX_PASSAGES_PER_SOURCE.
     """
-    if keywords is None:
-        keywords = GAUSSIAN_KEYWORDS
-
     lower_keywords = [kw.lower() for kw in keywords]
     candidates = []
     seen = set()

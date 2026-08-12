@@ -54,7 +54,7 @@ def test_fetch_se_returns_none_on_request_error(monkeypatch):
 
     monkeypatch.setattr(requests, "get", fake_get)
 
-    result = fetch_se_passages(tag="gaussian", site="chemistry")
+    result = fetch_se_passages(tag="gaussian", site="chemistry", keywords=["gaussian", "%mem", "%nproc"])
 
     assert result is None
 
@@ -66,7 +66,7 @@ def test_fetch_se_returns_none_on_non_200(monkeypatch):
         lambda *a, **kw: _fake_response(403, {}),
     )
 
-    result = fetch_se_passages(tag="gaussian", site="chemistry")
+    result = fetch_se_passages(tag="gaussian", site="chemistry", keywords=["gaussian", "%mem", "%nproc"])
 
     assert result is None
 
@@ -78,7 +78,7 @@ def test_fetch_se_returns_none_when_no_items(monkeypatch):
         _make_fake_get({"items": [], "has_more": False}),
     )
 
-    result = fetch_se_passages(tag="gaussian", site="chemistry")
+    result = fetch_se_passages(tag="gaussian", site="chemistry", keywords=["gaussian", "%mem", "%nproc"])
 
     assert result is None
 
@@ -92,7 +92,7 @@ def test_fetch_se_extracts_title_as_passage(monkeypatch):
         _make_fake_get({"items": [SAMPLE_QUESTION]}),
     )
 
-    result = fetch_se_passages(tag="gaussian", site="chemistry")
+    result = fetch_se_passages(tag="gaussian", site="chemistry", keywords=["gaussian", "%mem", "%nproc"])
 
     assert result is not None
     assert any("%mem" in p for p in result)
@@ -112,7 +112,7 @@ def test_fetch_se_strips_html_from_body(monkeypatch):
         _make_fake_get({"items": [question]}),
     )
 
-    result = fetch_se_passages(tag="gaussian", site="chemistry")
+    result = fetch_se_passages(tag="gaussian", site="chemistry", keywords=["gaussian", "%mem", "%nproc"])
 
     assert result is not None
     assert all("<" not in p for p in result)
@@ -167,7 +167,7 @@ def test_fetch_se_caps_at_max_passages(monkeypatch):
         _make_fake_get({"items": items}),
     )
 
-    result = fetch_se_passages(tag="gaussian", site="chemistry")
+    result = fetch_se_passages(tag="gaussian", site="chemistry", keywords=["gaussian", "%mem", "%nproc"])
 
     assert result is not None
     assert len(result) == 3
@@ -265,7 +265,7 @@ def test_fetch_se_deduplicates_repeated_lines(monkeypatch):
         _make_fake_get({"items": questions}),
     )
 
-    result = fetch_se_passages(tag="gaussian", site="chemistry")
+    result = fetch_se_passages(tag="gaussian", site="chemistry", keywords=["gaussian", "%mem", "%nproc"])
 
     assert result is not None
     assert result.count(duplicated_line) == 1
@@ -290,7 +290,7 @@ def test_fetch_se_includes_answer_passages(monkeypatch):
         ),
     )
 
-    result = fetch_se_passages(tag="gaussian", site="chemistry")
+    result = fetch_se_passages(tag="gaussian", site="chemistry", keywords=["gaussian", "%mem", "%nproc"])
 
     assert result is not None
     assert any("%mem" in p for p in result)
@@ -313,7 +313,7 @@ def test_fetch_se_answer_html_is_stripped(monkeypatch):
         ),
     )
 
-    result = fetch_se_passages(tag="gaussian", site="chemistry")
+    result = fetch_se_passages(tag="gaussian", site="chemistry", keywords=["gaussian", "%mem", "%nproc"])
 
     assert result is not None
     assert all("<" not in p for p in result)
@@ -327,7 +327,7 @@ def test_fetch_se_returns_question_passages_if_answers_fail(monkeypatch):
 
     monkeypatch.setattr(requests, "get", fake_get)
 
-    result = fetch_se_passages(tag="gaussian", site="chemistry")
+    result = fetch_se_passages(tag="gaussian", site="chemistry", keywords=["gaussian", "%mem", "%nproc"])
 
     assert result is not None
     assert len(result) > 0

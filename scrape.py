@@ -11,8 +11,6 @@ Usage:
     py scrape.py                        # launches the interactive setup wizard
     py scrape.py --list-configs         # shows configs you've already saved
     py scrape.py --config gaussian.toml # runs a saved config, no prompts
-    py scrape.py --legacy               # uses the original hardcoded Gaussian
-                                         # sources in sources.py as a fallback
 
 Run "py scrape.py --help" for the full option list with examples.
 """
@@ -27,7 +25,6 @@ from gaussian_scraper.config import ConfigError, ScraperConfig, load_toml_config
 from gaussian_scraper.dedup import dedupe_across_sources
 from gaussian_scraper.extractor import extract_relevant_passages
 from gaussian_scraper.fetcher import fetch_page_text
-from gaussian_scraper.sources import GAUSSIAN_KEYWORDS, GAUSSIAN_SOURCES, STACKEXCHANGE_SOURCES
 from gaussian_scraper.stackexchange import fetch_se_passages
 from gaussian_scraper.summarizer import (
     OLLAMA_MODEL,
@@ -88,7 +85,7 @@ def scrape_se_sources(se_sources: list[dict], keywords: list[str]) -> list[dict]
         print(f"Fetching: {label}")
         print(f"  Site: {site}, Tag: {tag}")
 
-        passages = fetch_se_passages(tag=tag, site=site, keywords=keywords)
+        passages = fetch_se_passages(tag=tag, keywords=keywords, site=site)
 
         if passages is None:
             print(f"  SKIPPED - could not reach API")
@@ -142,20 +139,6 @@ def save_results(results: list[dict], output_path: Path) -> None:
     print(f"\nSaved {len(results)} sources to {output_path}")
 
 
-def build_legacy_config() -> ScraperConfig:
-    """
-    Build a ScraperConfig from the original hardcoded Gaussian sources in
-    sources.py. Kept as a fallback so the scraper still works out of the
-    box for Gaussian without touching the config system.
-    """
-    return ScraperConfig(
-        name="gaussian",
-        keywords=GAUSSIAN_KEYWORDS,
-        html_sources=GAUSSIAN_SOURCES,
-        se_sources=STACKEXCHANGE_SOURCES,
-    ).validate()
-
-
 def list_configs(config_dir: Path) -> None:
     """Print the saved TOML configs in config_dir, so users don't need to know file paths."""
     if not config_dir.is_dir():
@@ -192,7 +175,6 @@ def parse_args() -> argparse.Namespace:
             "  py scrape.py --list-configs           show configs you've already saved\n"
             "  py scrape.py --config configs/gaussian.toml\n"
             "                                        re-run a saved config with no prompts\n"
-            "  py scrape.py --legacy                 use the original built-in Gaussian sources\n"
             "  py scrape.py --model llama3-cuttlefish\n"
             "                                        use a different Ollama model for summaries\n"
             "  py scrape.py --summary-timeout 180    give slow/CPU-only Ollama more time per summary\n"
@@ -203,11 +185,6 @@ def parse_args() -> argparse.Namespace:
         type=str,
         metavar="PATH",
         help="Path to a saved TOML config (see --list-configs). Skips the wizard.",
-    )
-    parser.add_argument(
-        "--legacy",
-        action="store_true",
-        help="Use the original built-in Gaussian sources instead of the config system.",
     )
     parser.add_argument(
         "--list-configs",
@@ -272,9 +249,7 @@ def main() -> None:
         list_configs(CONFIG_DIR)
     else:
         try:
-            if args.legacy:
-                config = build_legacy_config()
-            elif args.config:
+            if args.config:
                 config = load_toml_config(Path(args.config))
             else:
                 config = run_wizard()
