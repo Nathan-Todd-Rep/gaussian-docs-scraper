@@ -29,7 +29,12 @@ from gaussian_scraper.extractor import extract_relevant_passages
 from gaussian_scraper.fetcher import fetch_page_text
 from gaussian_scraper.sources import GAUSSIAN_KEYWORDS, GAUSSIAN_SOURCES, STACKEXCHANGE_SOURCES
 from gaussian_scraper.stackexchange import fetch_se_passages
-from gaussian_scraper.summarizer import OLLAMA_MODEL, is_ollama_available, summarize_passages
+from gaussian_scraper.summarizer import (
+    OLLAMA_MODEL,
+    REQUEST_TIMEOUT_SEC,
+    is_ollama_available,
+    summarize_passages,
+)
 from gaussian_scraper.wizard import run_wizard
 
 # Directory the wizard offers by default when saving configs; also where
@@ -104,9 +109,13 @@ def scrape_se_sources(se_sources: list[dict], keywords: list[str]) -> list[dict]
     return results
 
 
-def summarize_results(results: list[dict], model: str = OLLAMA_MODEL) -> None:
+def summarize_results(
+    results: list[dict],
+    model: str = OLLAMA_MODEL,
+    timeout: float = REQUEST_TIMEOUT_SEC,
+) -> None:
     """Attempt to summarize each result's passages using a local Ollama instance."""
-    print(f"\n--- Summarizing with Ollama (model: {model}) ---")
+    print(f"\n--- Summarizing with Ollama (model: {model}, timeout: {timeout:g}s) ---")
 
     if not is_ollama_available():
         print("  Ollama not reachable - skipping summarization")
@@ -115,7 +124,7 @@ def summarize_results(results: list[dict], model: str = OLLAMA_MODEL) -> None:
     for result in results:
         label = result["label"]
         print(f"  Summarizing: {label}")
-        summary = summarize_passages(result["passages"], label=label, model=model)
+        summary = summarize_passages(result["passages"], label=label, model=model, timeout=timeout)
         if summary:
             result["summary"] = summary
             print(f"  OK")
@@ -186,6 +195,7 @@ def parse_args() -> argparse.Namespace:
             "  py scrape.py --legacy                 use the original built-in Gaussian sources\n"
             "  py scrape.py --model llama3-cuttlefish\n"
             "                                        use a different Ollama model for summaries\n"
+            "  py scrape.py --summary-timeout 180    give slow/CPU-only Ollama more time per summary\n"
         ),
     )
     parser.add_argument(
@@ -211,10 +221,23 @@ def parse_args() -> argparse.Namespace:
         help=f"Ollama model to use for summarization (default: {OLLAMA_MODEL}). "
              f"Ignored if Ollama isn't running.",
     )
+    parser.add_argument(
+        "--summary-timeout",
+        type=float,
+        default=REQUEST_TIMEOUT_SEC,
+        metavar="SECONDS",
+        help=f"Seconds to wait per summarization request (default: {REQUEST_TIMEOUT_SEC:g}). "
+             f"CPU-only Ollama can be slow -- raise this if summaries keep getting "
+             f"skipped even though Ollama is running.",
+    )
     return parser.parse_args()
 
 
-def run_scrape(config: ScraperConfig, model: str = OLLAMA_MODEL) -> None:
+def run_scrape(
+    config: ScraperConfig,
+    model: str = OLLAMA_MODEL,
+    summary_timeout: float = REQUEST_TIMEOUT_SEC,
+) -> None:
     """Run the full scrape -> summarize -> save pipeline for a given config."""
     print(f"=== {config.name} Docs Scraper ===\n")
 
@@ -236,7 +259,7 @@ def run_scrape(config: ScraperConfig, model: str = OLLAMA_MODEL) -> None:
         print("\nNo results remain after deduplication.")
         return
 
-    summarize_results(results, model=model)
+    summarize_results(results, model=model, timeout=summary_timeout)
     save_results(results, config.output_path)
     total_passages = sum(len(r["passages"]) for r in results)
     print(f"Total passages collected: {total_passages}")
@@ -256,7 +279,7 @@ def main() -> None:
             else:
                 config = run_wizard()
 
-            run_scrape(config, model=args.model)
+            run_scrape(config, model=args.model, summary_timeout=args.summary_timeout)
         except ConfigError as e:
             print(f"\nConfig problem: {e}")
         except KeyboardInterrupt:

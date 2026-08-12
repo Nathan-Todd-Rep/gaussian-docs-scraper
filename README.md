@@ -87,6 +87,15 @@ Using a different model (e.g. one already pulled for another project)? Override 
 py scrape.py --model llama3-cuttlefish
 ```
 
+CPU-only Ollama (no GPU) can be slow -- real testing saw individual summaries
+take anywhere from ~20s to over 90s. The scraper waits up to 120s per summary
+by default; if summaries keep getting skipped even though Ollama is clearly
+running, give it more room with `--summary-timeout`:
+
+```bash
+py scrape.py --summary-timeout 180
+```
+
 ---
 
 ## Searching Scraped Passages by Relevance

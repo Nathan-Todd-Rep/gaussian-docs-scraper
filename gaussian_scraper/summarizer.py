@@ -5,7 +5,16 @@ import requests
 OLLAMA_URL = "http://localhost:11434/api/generate"
 OLLAMA_HEALTH_URL = "http://localhost:11434"
 OLLAMA_MODEL = "llama3"
-REQUEST_TIMEOUT_SEC = 30
+
+# CPU-only local inference is slow and varies a lot run to run -- real testing
+# against a freshly-pulled llama3 model saw single summarization calls take
+# anywhere from ~23s to ~32s, with a cold model load alone taking ~27s. A
+# short timeout here doesn't fail loudly, it fails *silently*: summarize_passages()
+# catches the timeout and returns None, so a slow-but-working Ollama looks
+# identical to a broken one ("SKIPPED - no response from Ollama"). 120s gives
+# real CPU inference enough headroom without waiting forever on a genuinely
+# hung request.
+REQUEST_TIMEOUT_SEC = 120
 
 # Maximum number of passages to include in a single summarization prompt.
 # The extractor already ranks passages by keyword-match score, so the top
@@ -50,6 +59,7 @@ def summarize_passages(
     passages: list[str],
     label: str = "HPC documentation about Gaussian",
     model: str = OLLAMA_MODEL,
+    timeout: float = REQUEST_TIMEOUT_SEC,
 ) -> str | None:
     """
     Send passages to a local Ollama instance and return a short summary.
@@ -59,6 +69,10 @@ def summarize_passages(
         label: Source label included in the prompt so Ollama has context
                about where the passages came from.
         model: Ollama model to use.
+        timeout: Seconds to wait for a response before giving up. CPU-only
+                 inference can be slow (see REQUEST_TIMEOUT_SEC) -- too short
+                 a value here means a slow-but-working Ollama silently looks
+                 identical to a broken one.
 
     Returns None if Ollama is not reachable or returns an unexpected response,
     so the caller can store passages without a summary rather than failing.
@@ -75,7 +89,7 @@ def summarize_passages(
         response = requests.post(
             OLLAMA_URL,
             json={"model": model, "prompt": prompt, "stream": False},
-            timeout=REQUEST_TIMEOUT_SEC,
+            timeout=timeout,
         )
     except requests.RequestException:
         return None

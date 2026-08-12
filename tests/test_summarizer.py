@@ -167,6 +167,36 @@ def test_summarize_returns_summary_string(monkeypatch):
     assert result == expected
 
 
+# --- timeout ---
+
+def test_summarize_passes_custom_timeout_to_request(monkeypatch):
+    captured_timeouts = []
+
+    def fake_post(url, json=None, timeout=None, **kwargs):
+        captured_timeouts.append(timeout)
+        return _fake_response(200, {"response": "A summary."})
+
+    monkeypatch.setattr(requests, "post", fake_post)
+
+    summarize_passages(SAMPLE_PASSAGES, timeout=180)
+
+    assert captured_timeouts == [180]
+
+
+def test_summarize_uses_default_timeout_when_not_specified(monkeypatch):
+    captured_timeouts = []
+
+    def fake_post(url, json=None, timeout=None, **kwargs):
+        captured_timeouts.append(timeout)
+        return _fake_response(200, {"response": "A summary."})
+
+    monkeypatch.setattr(requests, "post", fake_post)
+
+    summarize_passages(SAMPLE_PASSAGES)
+
+    assert captured_timeouts == [summarizer.REQUEST_TIMEOUT_SEC]
+
+
 # --- edge cases ---
 
 def test_summarize_returns_none_for_empty_passages(monkeypatch):
