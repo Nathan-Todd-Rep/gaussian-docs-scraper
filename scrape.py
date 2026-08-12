@@ -29,7 +29,7 @@ from gaussian_scraper.extractor import extract_relevant_passages
 from gaussian_scraper.fetcher import fetch_page_text
 from gaussian_scraper.sources import GAUSSIAN_KEYWORDS, GAUSSIAN_SOURCES, STACKEXCHANGE_SOURCES
 from gaussian_scraper.stackexchange import fetch_se_passages
-from gaussian_scraper.summarizer import is_ollama_available, summarize_passages
+from gaussian_scraper.summarizer import OLLAMA_MODEL, is_ollama_available, summarize_passages
 from gaussian_scraper.wizard import run_wizard
 
 # Directory the wizard offers by default when saving configs; also where
@@ -104,9 +104,9 @@ def scrape_se_sources(se_sources: list[dict], keywords: list[str]) -> list[dict]
     return results
 
 
-def summarize_results(results: list[dict]) -> None:
+def summarize_results(results: list[dict], model: str = OLLAMA_MODEL) -> None:
     """Attempt to summarize each result's passages using a local Ollama instance."""
-    print("\n--- Summarizing with Ollama ---")
+    print(f"\n--- Summarizing with Ollama (model: {model}) ---")
 
     if not is_ollama_available():
         print("  Ollama not reachable - skipping summarization")
@@ -115,7 +115,7 @@ def summarize_results(results: list[dict]) -> None:
     for result in results:
         label = result["label"]
         print(f"  Summarizing: {label}")
-        summary = summarize_passages(result["passages"], label=label)
+        summary = summarize_passages(result["passages"], label=label, model=model)
         if summary:
             result["summary"] = summary
             print(f"  OK")
@@ -184,6 +184,8 @@ def parse_args() -> argparse.Namespace:
             "  py scrape.py --config configs/gaussian.toml\n"
             "                                        re-run a saved config with no prompts\n"
             "  py scrape.py --legacy                 use the original built-in Gaussian sources\n"
+            "  py scrape.py --model llama3-cuttlefish\n"
+            "                                        use a different Ollama model for summaries\n"
         ),
     )
     parser.add_argument(
@@ -202,10 +204,17 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="List saved configs in the configs/ folder and exit.",
     )
+    parser.add_argument(
+        "--model",
+        type=str,
+        default=OLLAMA_MODEL,
+        help=f"Ollama model to use for summarization (default: {OLLAMA_MODEL}). "
+             f"Ignored if Ollama isn't running.",
+    )
     return parser.parse_args()
 
 
-def run_scrape(config: ScraperConfig) -> None:
+def run_scrape(config: ScraperConfig, model: str = OLLAMA_MODEL) -> None:
     """Run the full scrape -> summarize -> save pipeline for a given config."""
     print(f"=== {config.name} Docs Scraper ===\n")
 
@@ -227,7 +236,7 @@ def run_scrape(config: ScraperConfig) -> None:
         print("\nNo results remain after deduplication.")
         return
 
-    summarize_results(results)
+    summarize_results(results, model=model)
     save_results(results, config.output_path)
     total_passages = sum(len(r["passages"]) for r in results)
     print(f"Total passages collected: {total_passages}")
@@ -247,7 +256,7 @@ def main() -> None:
             else:
                 config = run_wizard()
 
-            run_scrape(config)
+            run_scrape(config, model=args.model)
         except ConfigError as e:
             print(f"\nConfig problem: {e}")
         except KeyboardInterrupt:

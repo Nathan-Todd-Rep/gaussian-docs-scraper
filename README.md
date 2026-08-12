@@ -81,6 +81,12 @@ ollama serve
 
 If Ollama is not running, the scraper falls back to storing raw passages, no setup required to use the scraper without it.
 
+Using a different model (e.g. one already pulled for another project)? Override it with `--model`:
+
+```bash
+py scrape.py --model llama3-cuttlefish
+```
+
 ---
 
 ## Searching Scraped Passages by Relevance
