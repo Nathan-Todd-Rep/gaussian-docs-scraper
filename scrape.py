@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
 from pathlib import Path
 
 from gaussian_scraper.config import ConfigError, ScraperConfig, load_toml_config
@@ -178,6 +179,7 @@ def parse_args() -> argparse.Namespace:
             "  py scrape.py --model llama3-cuttlefish\n"
             "                                        use a different Ollama model for summaries\n"
             "  py scrape.py --summary-timeout 180    give slow/CPU-only Ollama more time per summary\n"
+            "  py scrape.py --skip-summary           just scrape raw passages, no Ollama at all\n"
         ),
     )
     parser.add_argument(
@@ -207,6 +209,13 @@ def parse_args() -> argparse.Namespace:
              f"CPU-only Ollama can be slow -- raise this if summaries keep getting "
              f"skipped even though Ollama is running.",
     )
+    parser.add_argument(
+        "--skip-summary",
+        action="store_true",
+        help="Skip Ollama summarization entirely and just scrape raw passages. "
+             "Much faster on CPU-only machines; Inkly's retrieval reads raw "
+             "passages either way, so summaries aren't required for that.",
+    )
     return parser.parse_args()
 
 
@@ -214,9 +223,12 @@ def run_scrape(
     config: ScraperConfig,
     model: str = OLLAMA_MODEL,
     summary_timeout: float = REQUEST_TIMEOUT_SEC,
+    skip_summary: bool = False,
 ) -> None:
     """Run the full scrape -> summarize -> save pipeline for a given config."""
     print(f"=== {config.name} Docs Scraper ===\n")
+
+    start = time.monotonic()
 
     print("--- HPC Documentation Pages ---")
     results = scrape_html_sources(config.html_sources, config.keywords)
@@ -236,10 +248,18 @@ def run_scrape(
         print("\nNo results remain after deduplication.")
         return
 
-    summarize_results(results, model=model, timeout=summary_timeout)
+    scrape_elapsed = time.monotonic() - start
+
+    if skip_summary:
+        print("\n--- Skipping Ollama summarization (--skip-summary) ---")
+    else:
+        summarize_results(results, model=model, timeout=summary_timeout)
+
     save_results(results, config.output_path)
     total_passages = sum(len(r["passages"]) for r in results)
+    total_elapsed = time.monotonic() - start
     print(f"Total passages collected: {total_passages}")
+    print(f"Scrape+dedup time: {scrape_elapsed:.1f}s, total time: {total_elapsed:.1f}s")
 
 
 def main() -> None:
@@ -254,14 +274,19 @@ def main() -> None:
             else:
                 config = run_wizard()
 
-            run_scrape(config, model=args.model, summary_timeout=args.summary_timeout)
+            run_scrape(
+                config,
+                model=args.model,
+                summary_timeout=args.summary_timeout,
+                skip_summary=args.skip_summary,
+            )
         except ConfigError as e:
             print(f"\nConfig problem: {e}")
         except KeyboardInterrupt:
             print("\nCancelled.")
 
     # If launched by double-clicking rather than from an already-open
-    # terminal, Windows closes the console the instant the script exits --
+    # terminal, Windows closes the console the instant the script exits
     # the results flash by before anyone can read them. Pausing here keeps
     # the window open. Only do this when stdin is a real interactive
     # terminal, so automated/piped runs (CI, scripts) never hang waiting
