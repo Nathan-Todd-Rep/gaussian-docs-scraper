@@ -53,6 +53,22 @@ Run `py scrape.py --help` for the full option list with examples.
 
 ---
 
+## Continuous Re-scraping
+
+`Daily Scrape.bat` re-scrapes a domain unattended with `--skip-summary` (raw
+passages only, no Ollama needed) and appends output to
+`~/.inkly/daily_scrape.log`. It's meant to be run by a scheduled task, not
+double-clicked -- on this machine it's registered as a Windows Task Scheduler
+entry (`GaussianScraperDailyScrape`, daily at 3:00 AM, runs only while logged
+in) that keeps `gaussian.db` fresh without manual re-runs. Content-hashing
+(see Output Format below) means a future full run *with* summarization would
+only re-summarize sources whose content actually changed, so this is safe to
+extend to summarized runs later without repeatedly re-paying for unchanged
+sources. Currently scoped to the gaussian domain only; add more `--config`
+lines to the batch file once other domains are ready for the same treatment.
+
+---
+
 ## Ollama Summarization
 
 If you have Ollama installed and running locally, the scraper will summarize each source's passages into 2-3 sentences before saving. This makes the content surfaced by Inkly cleaner and more concise.

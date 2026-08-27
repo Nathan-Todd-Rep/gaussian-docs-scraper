@@ -85,6 +85,18 @@ GAUSSIAN_PRESET = {
             "label": "GWDG - Gaussian",
             "url": "https://docs.hpc.gwdg.de/software_stacks/applications/gaussian/index.html",
         },
+        {
+            "label": "George Mason ORC - Gaussian",
+            "url": "https://wiki.orc.gmu.edu/mkdocs/Running_Gaussian/",
+        },
+        {
+            "label": "HPC2N Umea - Gaussian",
+            "url": "https://docs.hpc2n.umu.se/software/apps/gaussian/",
+        },
+        {
+            "label": "Flinders DeepThought - Gaussian",
+            "url": "https://deepthoughtdocs.flinders.edu.au/en/develop/software/gaussian16.html",
+        },
     ],
     "se_sources": [
         {

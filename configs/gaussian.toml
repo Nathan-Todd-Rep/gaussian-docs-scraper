@@ -58,6 +58,18 @@ url = "https://hpc.ncsu.edu/Software/Apps.php?app=Gaussian"
 label = "GWDG - Gaussian"
 url = "https://docs.hpc.gwdg.de/software_stacks/applications/gaussian/index.html"
 
+[[html_sources]]
+label = "George Mason ORC - Gaussian"
+url = "https://wiki.orc.gmu.edu/mkdocs/Running_Gaussian/"
+
+[[html_sources]]
+label = "HPC2N Umea - Gaussian"
+url = "https://docs.hpc2n.umu.se/software/apps/gaussian/"
+
+[[html_sources]]
+label = "Flinders DeepThought - Gaussian"
+url = "https://deepthoughtdocs.flinders.edu.au/en/develop/software/gaussian16.html"
+
 [[se_sources]]
 label = "Matter Modeling Stack Exchange - gaussian tag"
 site = "mattermodeling"
