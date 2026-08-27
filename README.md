@@ -15,20 +15,6 @@ Passages are keyword-filtered and capped per source to keep the output focused. 
 
 ---
 
-## Quick Start on Windows (no command line needed)
-
-1. Download this repository as a ZIP (green "Code" button above -> "Download ZIP") and extract it.
-2. Make sure Python is installed. If you're not sure, get it from
-   [python.org/downloads](https://www.python.org/downloads/) -- on the first
-   install screen, check "Add python.exe to PATH" before clicking Install.
-3. Double-click `Run Scraper.bat`.
-
-That's it. It installs the required packages automatically and launches the
-setup wizard. If Python isn't installed yet, it tells you exactly what to do
-instead of just failing.
-
----
-
 ## Installation
 
 Install dependencies (BS4):
