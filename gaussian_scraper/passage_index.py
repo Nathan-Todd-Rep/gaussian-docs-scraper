@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
+from gaussian_scraper import storage
 from gaussian_scraper.config import DEFAULT_OUTPUT_DIR
 from gaussian_scraper.embedding import TfidfEmbedder, cosine_similarity
 
@@ -32,8 +32,8 @@ class PassageIndex:
     with total scraped volume instead of staying bounded, and the model
     has to sift through mostly-irrelevant text to find what matters.
 
-    Built directly from the JSON a scrape run produces -- no separate
-    database or extra scrape step needed.
+    Built directly from the SQLite database a scrape run produces -- no
+    extra scrape step needed.
     """
 
     def __init__(self, domain: str, records: list[dict]):
@@ -54,20 +54,16 @@ class PassageIndex:
     @classmethod
     def load(cls, domain: str, docs_dir: Path | None = None) -> "PassageIndex":
         """
-        Build a PassageIndex from a domain's scraped JSON file.
+        Build a PassageIndex from a domain's SQLite database.
 
         Reads from the same default location scrape.py writes to
-        (~/.inkly/{domain}_docs.json unless a config overrides it), so no
+        (~/.inkly/{domain}.db unless a config overrides it), so no
         extra setup is needed beyond having already run the scraper for
         that domain.
         """
         docs_dir = docs_dir or DEFAULT_OUTPUT_DIR
-        path = Path(docs_dir) / f"{domain}_docs.json"
-
-        if not path.exists():
-            raise FileNotFoundError(f"No scraped data for domain '{domain}' at {path}")
-
-        records = json.loads(path.read_text(encoding="utf-8"))
+        db_path = Path(docs_dir) / f"{domain}.db"
+        records = storage.load_domain_records(domain, db_path)
         return cls(domain, records)
 
     def search(self, query: str, *, top_k: int = 5) -> List[PassageMatch]:

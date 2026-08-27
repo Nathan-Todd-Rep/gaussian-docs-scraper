@@ -1,6 +1,6 @@
 name = "bioinformatics"
 keywords = ["rna-seq", "fastq", "samtools", "bwa", "gatk", "genome", "variant-calling", "ngs", "vcf", "alignment", "bam", "blast"]
-output_path = "C:\\Users\\Nathan\\.inkly\\bioinformatics_docs.json"
+output_path = "C:\\Users\\Nathan\\.inkly\\bioinformatics.db"
 
 [[html_sources]]
 label = "Ohio Supercomputer Center - BWA"

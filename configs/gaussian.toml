@@ -1,6 +1,6 @@
 name = "gaussian"
 keywords = ["gaussian", "g09", "g16", "computational chemistry", "quantum chemistry", "slurm", "sbatch", "module load", "mem=", "nproc=", "%mem", "%nproc", "basis set", "dft", "density functional"]
-output_path = "C:\\Users\\Nathan\\.inkly\\gaussian_docs.json"
+output_path = "C:\\Users\\Nathan\\.inkly\\gaussian.db"
 
 [[html_sources]]
 label = "Harvard RC - Gaussian"

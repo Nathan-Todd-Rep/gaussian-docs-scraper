@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import json
-
 import pytest
 
+from gaussian_scraper import storage
 from gaussian_scraper.passage_index import PassageIndex
 
 
@@ -67,9 +66,9 @@ def test_load_raises_for_missing_domain_file(tmp_path):
         PassageIndex.load("nonexistent", docs_dir=tmp_path)
 
 
-def test_load_reads_scraped_json_for_domain(tmp_path):
-    records = [{"label": "A", "passages": ["Load the gaussian module."]}]
-    (tmp_path / "gaussian_docs.json").write_text(json.dumps(records), encoding="utf-8")
+def test_load_reads_scraped_sqlite_db_for_domain(tmp_path):
+    results = [{"label": "A", "url": "https://example.com", "passages": ["Load the gaussian module."]}]
+    storage.save_results(results, tmp_path / "gaussian.db")
 
     index = PassageIndex.load("gaussian", docs_dir=tmp_path)
     matches = index.search("gaussian module")

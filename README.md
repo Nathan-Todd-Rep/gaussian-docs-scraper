@@ -1,6 +1,6 @@
 # Gaussian Docs Scraper
 
-A scraper that collects Gaussian-related passages from HPC documentation sources and saves them to `~/.inkly/gaussian_docs.json`. This file is read at runtime by the `docs_gaussian` plugin in [Inkly](https://github.com/Nathan-Todd-Rep/hpc-ink-setup).
+A domain-agnostic scraper that collects HPC documentation and Stack Exchange passages for a research topic (e.g. Gaussian, bioinformatics) and saves them to a per-domain SQLite database at `~/.inkly/{name}.db`, for [Inkly](https://github.com/Nathan-Todd-Rep/hpc-ink-setup) or any other consumer to read.
 
 ---
 
@@ -49,8 +49,7 @@ py scrape.py
 
 The wizard asks what to scrape (a built-in preset or a custom topic), lets you
 add extra sources, and saves the result for Inkly to read. Output defaults to
-`~/.inkly/{name}_docs.json`; the Inkly `docs_gaussian` plugin reads the
-Gaussian file automatically at runtime.
+`~/.inkly/{name}.db`, a SQLite database `search_docs.py` (and Inkly) can query.
 
 Already have a config from a previous run? See what's saved with:
 
@@ -117,22 +116,20 @@ needs to load the entire scraped dataset to answer one question. See
 
 ## Output Format
 
-Each entry in `gaussian_docs.json` looks like this:
+Each domain's data lives in its own SQLite database (`~/.inkly/{name}.db`), with
+two tables:
 
-```json
-{
-  "label": "Chemistry Stack Exchange - Gaussian",
-  "site": "chemistry",
-  "tag": "gaussian",
-  "passages": [
-    "Set %mem=8GB and %nproc=4 in your Gaussian input file to match your Slurm resource request.",
-    "..."
-  ],
-  "summary": "Gaussian 16 jobs on HPC clusters should set %mem and %nproc to match Slurm resource requests."
-}
-```
+- `sources`: one row per scraped source (`label`, `source_type` [`html`/`se`],
+  `url` or `site`/`tag`, `content_hash`, `summary`, `last_scraped_at`).
+  `content_hash` is a hash of the source's passages, used to skip
+  re-summarizing a source whose content hasn't changed since the last scrape.
+  `summary` is only populated when Ollama summarization ran successfully (or
+  was reused from a prior run via the content hash).
+- `passages`: one row per passage, linked to its source and ordered by
+  position.
 
-The `summary` key is only present when Ollama summarization ran successfully.
+See `gaussian_scraper/storage.py` for the schema and `search_docs.py` /
+`gaussian_scraper/passage_index.py` for how it's queried.
 
 ---
 

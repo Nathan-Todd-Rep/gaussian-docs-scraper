@@ -93,14 +93,19 @@ def test_config_rejects_se_source_missing_label():
 
 def test_config_default_output_path():
     config = _valid_config()
-    expected = Path.home() / ".inkly" / "gaussian_docs.json"
+    expected = Path.home() / ".inkly" / "gaussian.db"
     assert config.output_path == expected
 
 
 def test_config_custom_output_path():
-    custom = Path("/tmp/my_docs.json")
+    custom = Path("/tmp/my_docs.db")
     config = _valid_config(output_path=custom)
     assert config.output_path == custom
+
+
+def test_config_rejects_json_output_path():
+    with pytest.raises(ConfigError, match=r"\.db"):
+        _valid_config(output_path=Path("/tmp/gaussian_docs.json")).validate()
 
 
 # --- TOML loader ---
@@ -127,7 +132,7 @@ def test_load_toml_config_happy_path(tmp_path):
     assert "gaussian" in config.keywords
     assert len(config.html_sources) == 1
     assert len(config.se_sources) == 1
-    assert config.output_path == Path.home() / ".inkly" / "gaussian_docs.json"
+    assert config.output_path == Path.home() / ".inkly" / "gaussian.db"
 
 
 def test_load_toml_config_missing_file(tmp_path):
@@ -156,7 +161,7 @@ def test_load_toml_config_custom_output_path(tmp_path):
     toml_file.write_text(textwrap.dedent("""
         name = "gaussian"
         keywords = ["gaussian"]
-        output_path = "/tmp/custom_docs.json"
+        output_path = "/tmp/custom_docs.db"
 
         [[html_sources]]
         label = "Harvard RC"
@@ -165,7 +170,7 @@ def test_load_toml_config_custom_output_path(tmp_path):
 
     config = load_toml_config(toml_file)
 
-    assert config.output_path == Path("/tmp/custom_docs.json")
+    assert config.output_path == Path("/tmp/custom_docs.db")
 
 
 # --- save_toml_config ---

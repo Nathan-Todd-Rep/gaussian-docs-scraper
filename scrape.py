@@ -4,7 +4,7 @@ Domain-agnostic HPC documentation scraper.
 
 Scrapes HTML documentation pages and Stack Exchange questions/answers for
 a given research domain (e.g. Gaussian, bioinformatics) and saves the
-result to ~/.inkly/{name}_docs.json for Inkly to read at runtime.
+result to ~/.inkly/{name}.db for Inkly to read at runtime.
 
 Usage:
 
@@ -17,11 +17,11 @@ Run "py scrape.py --help" for the full option list with examples.
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 import time
 from pathlib import Path
 
+from gaussian_scraper import storage
 from gaussian_scraper.config import ConfigError, ScraperConfig, load_toml_config
 from gaussian_scraper.dedup import dedupe_across_sources
 from gaussian_scraper.extractor import extract_relevant_passages
@@ -111,15 +111,40 @@ def summarize_results(
     results: list[dict],
     model: str = OLLAMA_MODEL,
     timeout: float = REQUEST_TIMEOUT_SEC,
+    db_path: Path | None = None,
 ) -> None:
-    """Attempt to summarize each result's passages using a local Ollama instance."""
+    """
+    Attempt to summarize each result's passages using a local Ollama instance.
+
+    If db_path is given, sources whose content hasn't changed since the
+    last scrape (same content hash) reuse their previously stored summary
+    instead of calling Ollama again -- this is checked before the
+    reachability check below, so unchanged sources keep their cached
+    summary even if Ollama is completely down.
+    """
     print(f"\n--- Summarizing with Ollama (model: {model}, timeout: {timeout:g}s) ---")
+
+    pending = []
+    for result in results:
+        if db_path is not None:
+            stored = storage.get_source_hash_and_summary(result["label"], db_path)
+            if stored is not None:
+                stored_hash, stored_summary = stored
+                if stored_summary and stored_hash == storage.compute_content_hash(result["passages"]):
+                    result["summary"] = stored_summary
+                    print(f"  Reusing cached summary: {result['label']} (content unchanged)")
+                    continue
+        pending.append(result)
+
+    if not pending:
+        print("  All sources unchanged since last scrape - nothing new to summarize")
+        return
 
     if not is_ollama_available():
         print("  Ollama not reachable - skipping summarization")
         return
 
-    for result in results:
+    for result in pending:
         label = result["label"]
         print(f"  Summarizing: {label}")
         summary = summarize_passages(result["passages"], label=label, model=model, timeout=timeout)
@@ -128,16 +153,6 @@ def summarize_results(
             print(f"  OK")
         else:
             print(f"  SKIPPED - no response from Ollama")
-
-
-def save_results(results: list[dict], output_path: Path) -> None:
-    """Save scraped results to the given output JSON file."""
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(
-        json.dumps(results, indent=2),
-        encoding="utf-8",
-    )
-    print(f"\nSaved {len(results)} sources to {output_path}")
 
 
 def list_configs(config_dir: Path) -> None:
@@ -253,9 +268,10 @@ def run_scrape(
     if skip_summary:
         print("\n--- Skipping Ollama summarization (--skip-summary) ---")
     else:
-        summarize_results(results, model=model, timeout=summary_timeout)
+        summarize_results(results, model=model, timeout=summary_timeout, db_path=config.output_path)
 
-    save_results(results, config.output_path)
+    storage.save_results(results, config.output_path)
+    print(f"\nSaved {len(results)} sources to {config.output_path}")
     total_passages = sum(len(r["passages"]) for r in results)
     total_elapsed = time.monotonic() - start
     print(f"Total passages collected: {total_passages}")

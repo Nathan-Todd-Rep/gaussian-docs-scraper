@@ -32,8 +32,8 @@ class ScraperConfig:
                       contain at least one keyword to be kept.
         html_sources: List of {label, url} dicts for HTML pages to scrape.
         se_sources:   List of {site, tag, label} dicts for Stack Exchange sources.
-        output_path:  Path to write the scraped JSON. Defaults to
-                      ~/.inkly/{name}_docs.json.
+        output_path:  Path to the domain's SQLite database file. Defaults to
+                      ~/.inkly/{name}.db.
     """
 
     name: str
@@ -44,7 +44,7 @@ class ScraperConfig:
 
     def __post_init__(self):
         if self.output_path is None:
-            self.output_path = DEFAULT_OUTPUT_DIR / f"{self.name}_docs.json"
+            self.output_path = DEFAULT_OUTPUT_DIR / f"{self.name}.db"
         self.output_path = Path(self.output_path)
 
     def validate(self) -> "ScraperConfig":
@@ -88,6 +88,13 @@ class ScraperConfig:
                 raise ConfigError(f"se_sources[{i}] is missing required field 'tag'.")
             if "label" not in source:
                 raise ConfigError(f"se_sources[{i}] is missing required field 'label'.")
+
+        if self.output_path.suffix == ".json":
+            raise ConfigError(
+                f"output_path '{self.output_path}' still points at a .json file. "
+                f"Storage is now SQLite-based -- update output_path in your TOML "
+                f"config to end in .db (e.g. '{self.output_path.with_suffix('.db')}')."
+            )
 
         return self
 
