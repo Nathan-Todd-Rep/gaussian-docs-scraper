@@ -176,6 +176,21 @@ BIOINFORMATICS_PRESET = {
     ],
     "html_sources": [
         {
+            "label": "Samtools GitHub",
+            "url": "https://github.com/samtools/samtools",
+            "tool": "samtools",
+        },
+        {
+            "label": "BWA GitHub (lh3)",
+            "url": "https://github.com/lh3/bwa",
+            "tool": "bwa",
+        },
+        {
+            "label": "OSG Connect - BWA Tutorial",
+            "url": "https://github.com/OSGConnect/tutorial-bwa",
+            "tool": "bwa",
+        },
+        {
             "label": "Ohio Supercomputer Center - BWA",
             "url": "https://www.osc.edu/resources/available_software/software_list/bwa",
         },
