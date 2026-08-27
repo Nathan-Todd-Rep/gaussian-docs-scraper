@@ -100,6 +100,26 @@ needs to load the entire scraped dataset to answer one question. See
 
 ---
 
+## Discovering New Sources
+
+Every source in `configs/*.toml` today was found by manually web-searching and
+hand-adding it. The `/discover-sources <domain>` command (a Claude Code skill,
+see `.claude/skills/discover-sources/`) automates the search step: it looks for
+new candidate HTML documentation pages for a domain, validates them with
+`check_sources.py`, and writes a proposal file to
+`discovery_candidates/{domain}_{date}.md` -- it never edits `configs/*.toml` or
+`presets.py` itself. Reviewing the proposal and copying accepted sources into a
+config stays a manual step.
+
+```bash
+# from within a Claude Code session in this repo
+/discover-sources gaussian
+```
+
+Currently covers HTML sources only, not Stack Exchange tags.
+
+---
+
 ## Output Format
 
 Each domain's data lives in its own SQLite database (`~/.inkly/{name}.db`), with
