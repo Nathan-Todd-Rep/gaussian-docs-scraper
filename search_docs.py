@@ -31,6 +31,13 @@ def parse_args() -> argparse.Namespace:
         default=5,
         help="Maximum number of passages to return (default: 5).",
     )
+    parser.add_argument(
+        "--tool",
+        type=str,
+        default=None,
+        help="Only search passages from sources tagged with this tool (e.g. 'samtools'). "
+             "Only meaningful for domains that tag sources by tool.",
+    )
     return parser.parse_args()
 
 
@@ -54,7 +61,7 @@ def main() -> None:
     except FileNotFoundError as e:
         raise SystemExit(str(e))
 
-    matches = index.search(args.query, top_k=args.top_k)
+    matches = index.search(args.query, top_k=args.top_k, tool=args.tool)
     print_matches(matches)
 
 

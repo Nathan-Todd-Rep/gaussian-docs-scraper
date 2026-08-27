@@ -177,6 +177,8 @@ def save_toml_config(config: ScraperConfig, path: Path) -> None:
         lines.append("[[html_sources]]")
         lines.append(f"label = {_toml_string(source['label'])}")
         lines.append(f"url = {_toml_string(source['url'])}")
+        if source.get("tool"):
+            lines.append(f"tool = {_toml_string(source['tool'])}")
 
     for source in config.se_sources:
         lines.append("")
@@ -184,6 +186,8 @@ def save_toml_config(config: ScraperConfig, path: Path) -> None:
         lines.append(f"label = {_toml_string(source['label'])}")
         lines.append(f"site = {_toml_string(source['site'])}")
         lines.append(f"tag = {_toml_string(source['tag'])}")
+        if source.get("tool"):
+            lines.append(f"tool = {_toml_string(source['tool'])}")
 
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")

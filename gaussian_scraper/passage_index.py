@@ -17,6 +17,7 @@ class PassageMatch:
     label: str
     text: str
     score: float
+    tool: str | None = None
 
 
 class PassageIndex:
@@ -40,16 +41,17 @@ class PassageIndex:
         self.domain = domain
         self._embedder = TfidfEmbedder()
 
-        # One (label, passage text) pair per scraped passage, flattened
-        # across every source in the domain.
-        self._entries: List[tuple[str, str]] = [
-            (source.get("label", "Unknown source"), passage)
+        # One (label, tool, passage text) triple per scraped passage,
+        # flattened across every source in the domain. tool is None for
+        # sources that aren't tagged to a specific tool.
+        self._entries: List[tuple[str, str | None, str]] = [
+            (source.get("label", "Unknown source"), source.get("tool"), passage)
             for source in records
             for passage in source.get("passages", [])
         ]
 
-        self._embedder.fit(text for _, text in self._entries)
-        self._vectors = [self._embedder.encode(text) for _, text in self._entries]
+        self._embedder.fit(text for _, _, text in self._entries)
+        self._vectors = [self._embedder.encode(text) for _, _, text in self._entries]
 
     @classmethod
     def load(cls, domain: str, docs_dir: Path | None = None) -> "PassageIndex":
@@ -66,10 +68,16 @@ class PassageIndex:
         records = storage.load_domain_records(domain, db_path)
         return cls(domain, records)
 
-    def search(self, query: str, *, top_k: int = 5) -> List[PassageMatch]:
+    def search(self, query: str, *, top_k: int = 5, tool: str | None = None) -> List[PassageMatch]:
         """
         Return the top_k passages most relevant to query, ranked by cosine
         similarity, highest first.
+
+        If tool is given, only passages from sources tagged with that tool
+        are considered -- top_k then means "top k within that tool", not
+        "top k overall, filtered down afterward". Domains that don't tag
+        sources by tool (e.g. gaussian) should leave tool unset, since
+        every entry's tool is None there and nothing would match otherwise.
 
         A passage scored 0.0 shares no known vocabulary with the query --
         callers should generally treat that as "no match" rather than a
@@ -77,12 +85,21 @@ class PassageIndex:
         """
         query_vector = self._embedder.encode(query)
 
+        indices = (
+            range(len(self._entries))
+            if tool is None
+            else [i for i, (_, entry_tool, _) in enumerate(self._entries) if entry_tool == tool]
+        )
+
         scored = [
-            PassageMatch(domain=self.domain, label=label, text=text, score=score)
-            for (label, text), score in zip(
-                self._entries,
-                (cosine_similarity(query_vector, vector) for vector in self._vectors),
+            PassageMatch(
+                domain=self.domain,
+                label=self._entries[i][0],
+                text=self._entries[i][2],
+                score=cosine_similarity(query_vector, self._vectors[i]),
+                tool=self._entries[i][1],
             )
+            for i in indices
         ]
 
         scored.sort(key=lambda match: match.score, reverse=True)

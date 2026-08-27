@@ -68,6 +68,7 @@ def scrape_html_sources(html_sources: list[dict], keywords: list[str]) -> list[d
         results.append({
             "label": label,
             "url": url,
+            "tool": source.get("tool"),
             "passages": passages,
         })
 
@@ -101,6 +102,7 @@ def scrape_se_sources(se_sources: list[dict], keywords: list[str]) -> list[dict]
             "label": label,
             "site": site,
             "tag": tag,
+            "tool": source.get("tool"),
             "passages": passages,
         })
 

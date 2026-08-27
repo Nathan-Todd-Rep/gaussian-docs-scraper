@@ -23,6 +23,54 @@ def test_init_db_creates_expected_tables(tmp_path):
     assert {"sources", "passages"} <= tables
 
 
+def test_init_db_includes_tool_column_on_fresh_db(tmp_path):
+    db_path = tmp_path / "gaussian.db"
+    storage.init_db(db_path)
+
+    conn = sqlite3.connect(db_path)
+    columns = [row[1] for row in conn.execute("PRAGMA table_info(sources)").fetchall()]
+    conn.close()
+
+    assert "tool" in columns
+
+
+def test_init_db_migrates_existing_db_missing_tool_column(tmp_path):
+    db_path = tmp_path / "bioinformatics.db"
+
+    # Simulate a DB created before the tool column existed.
+    conn = sqlite3.connect(db_path)
+    conn.execute("""
+        CREATE TABLE sources (
+            id              INTEGER PRIMARY KEY,
+            label           TEXT NOT NULL UNIQUE,
+            source_type     TEXT NOT NULL,
+            url             TEXT,
+            site            TEXT,
+            tag             TEXT,
+            content_hash    TEXT NOT NULL,
+            summary         TEXT,
+            last_scraped_at TEXT NOT NULL
+        )
+    """)
+    conn.execute(
+        "INSERT INTO sources (label, source_type, url, content_hash, last_scraped_at) "
+        "VALUES ('Old Source', 'html', 'https://example.com', 'abc123', '2026-01-01')"
+    )
+    conn.commit()
+    conn.close()
+
+    storage.init_db(db_path)
+
+    conn = sqlite3.connect(db_path)
+    columns = [row[1] for row in conn.execute("PRAGMA table_info(sources)").fetchall()]
+    label, tool = conn.execute("SELECT label, tool FROM sources WHERE label = 'Old Source'").fetchone()
+    conn.close()
+
+    assert "tool" in columns
+    assert label == "Old Source"
+    assert tool is None
+
+
 # --- compute_content_hash ---
 
 def test_compute_content_hash_is_order_independent():
@@ -78,8 +126,24 @@ def test_save_results_round_trips_through_load_domain_records(tmp_path):
     records = storage.load_domain_records("gaussian", db_path)
 
     assert records == [
-        {"label": "Harvard RC", "passages": ["one", "two"]},
-        {"label": "MM SE - gaussian", "passages": ["three"]},
+        {"label": "Harvard RC", "tool": None, "passages": ["one", "two"]},
+        {"label": "MM SE - gaussian", "tool": None, "passages": ["three"]},
+    ]
+
+
+def test_save_results_round_trips_tool_field(tmp_path):
+    db_path = tmp_path / "bioinformatics.db"
+    results = [
+        {"label": "Samtools GitHub", "url": "https://github.com/samtools/samtools", "tool": "samtools", "passages": ["one"]},
+        {"label": "General Bio Guide", "url": "https://example.com", "passages": ["two"]},
+    ]
+    storage.save_results(results, db_path)
+
+    records = storage.load_domain_records("bioinformatics", db_path)
+
+    assert records == [
+        {"label": "Samtools GitHub", "tool": "samtools", "passages": ["one"]},
+        {"label": "General Bio Guide", "tool": None, "passages": ["two"]},
     ]
 
 
@@ -110,7 +174,7 @@ def test_save_results_rerun_replaces_domain_without_duplicates(tmp_path):
 
     records = storage.load_domain_records("gaussian", db_path)
 
-    assert records == [{"label": "A", "passages": ["one updated"]}]
+    assert records == [{"label": "A", "tool": None, "passages": ["one updated"]}]
 
 
 def test_load_domain_records_raises_when_db_missing(tmp_path):

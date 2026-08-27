@@ -3,6 +3,11 @@ keywords = ["rna-seq", "fastq", "samtools", "bwa", "gatk", "genome", "variant-ca
 output_path = "C:\\Users\\Nathan\\.inkly\\bioinformatics.db"
 
 [[html_sources]]
+label = "Samtools GitHub"
+url = "https://github.com/samtools/samtools"
+tool = "samtools"
+
+[[html_sources]]
 label = "Ohio Supercomputer Center - BWA"
 url = "https://www.osc.edu/resources/available_software/software_list/bwa"
 

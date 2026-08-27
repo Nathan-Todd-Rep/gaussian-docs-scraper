@@ -53,6 +53,41 @@ def test_search_matches_carry_domain_and_label():
     assert matches[0].label == "NERSC - Gaussian"
 
 
+def test_search_with_tool_filter_only_returns_that_tool():
+    records = [
+        {"label": "Samtools Docs", "tool": "samtools", "passages": ["samtools sort -o out.bam in.bam"]},
+        {"label": "BWA Docs", "tool": "bwa", "passages": ["bwa mem -t 4 ref.fa reads.fq"]},
+    ]
+    index = PassageIndex("bioinformatics", records)
+
+    matches = index.search("bioinformatics command", top_k=10, tool="samtools")
+
+    assert len(matches) == 1
+    assert matches[0].label == "Samtools Docs"
+    assert matches[0].tool == "samtools"
+
+
+def test_search_without_tool_filter_returns_all_tools():
+    records = [
+        {"label": "Samtools Docs", "tool": "samtools", "passages": ["samtools sort -o out.bam in.bam"]},
+        {"label": "BWA Docs", "tool": "bwa", "passages": ["bwa mem -t 4 ref.fa reads.fq"]},
+    ]
+    index = PassageIndex("bioinformatics", records)
+
+    matches = index.search("bioinformatics command", top_k=10)
+
+    assert {match.label for match in matches} == {"Samtools Docs", "BWA Docs"}
+
+
+def test_search_tool_filter_with_no_matching_tool_returns_empty():
+    records = [{"label": "Samtools Docs", "tool": "samtools", "passages": ["samtools sort"]}]
+    index = PassageIndex("bioinformatics", records)
+
+    matches = index.search("samtools", tool="nonexistent-tool")
+
+    assert matches == []
+
+
 def test_index_with_no_passages_returns_no_matches():
     index = PassageIndex("gaussian", [])
 

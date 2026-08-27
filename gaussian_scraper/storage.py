@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS sources (
     url             TEXT,
     site            TEXT,
     tag             TEXT,
+    tool            TEXT,
     content_hash    TEXT NOT NULL,
     summary         TEXT,
     last_scraped_at TEXT NOT NULL
@@ -29,6 +30,19 @@ CREATE INDEX IF NOT EXISTS idx_passages_source_id ON passages(source_id);
 """
 
 
+def _ensure_tool_column(conn: sqlite3.Connection) -> None:
+    """
+    Add the tool column to a database created before it existed.
+
+    CREATE TABLE IF NOT EXISTS is a no-op against an already-existing
+    sources table, so a DB created before this column existed needs an
+    explicit ALTER TABLE to catch up without losing its existing rows.
+    """
+    columns = [row[1] for row in conn.execute("PRAGMA table_info(sources)").fetchall()]
+    if "tool" not in columns:
+        conn.execute("ALTER TABLE sources ADD COLUMN tool TEXT")
+
+
 def _connect(db_path: Path) -> sqlite3.Connection:
     """Open a connection with foreign keys enabled, creating the parent dir if needed."""
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -42,6 +56,7 @@ def init_db(db_path: Path) -> None:
     conn = _connect(db_path)
     try:
         conn.executescript(_SCHEMA)
+        _ensure_tool_column(conn)
         conn.commit()
     finally:
         conn.close()
@@ -82,8 +97,8 @@ def save_results(results: list[dict], db_path: Path) -> None:
             content_hash = compute_content_hash(result["passages"])
             cursor = conn.execute(
                 """
-                INSERT INTO sources (label, source_type, url, site, tag, content_hash, summary, last_scraped_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO sources (label, source_type, url, site, tag, tool, content_hash, summary, last_scraped_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     result["label"],
@@ -91,6 +106,7 @@ def save_results(results: list[dict], db_path: Path) -> None:
                     result.get("url"),
                     result.get("site"),
                     result.get("tag"),
+                    result.get("tool"),
                     content_hash,
                     result.get("summary"),
                     now,
@@ -124,17 +140,21 @@ def load_domain_records(domain: str, db_path: Path) -> list[dict]:
 
     conn = _connect(db_path)
     try:
-        rows = conn.execute("SELECT id, label FROM sources ORDER BY id").fetchall()
+        rows = conn.execute("SELECT id, label, tool FROM sources ORDER BY id").fetchall()
         if not rows:
             raise FileNotFoundError(f"No scraped data for domain '{domain}' at {db_path}")
 
         records = []
-        for source_id, label in rows:
+        for source_id, label, tool in rows:
             passage_rows = conn.execute(
                 "SELECT text FROM passages WHERE source_id = ? ORDER BY position",
                 (source_id,),
             ).fetchall()
-            records.append({"label": label, "passages": [text for (text,) in passage_rows]})
+            records.append({
+                "label": label,
+                "tool": tool,
+                "passages": [text for (text,) in passage_rows],
+            })
 
         return records
     finally:

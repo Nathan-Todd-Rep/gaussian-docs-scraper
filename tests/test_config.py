@@ -197,6 +197,34 @@ def test_save_toml_config_round_trips(tmp_path):
     assert reloaded.output_path == config.output_path
 
 
+def test_save_toml_config_round_trips_tool_field(tmp_path):
+    config = _valid_config(
+        name="bioinformatics",
+        keywords=["samtools"],
+        html_sources=[{"label": "Samtools GitHub", "url": "https://github.com/samtools/samtools", "tool": "samtools"}],
+        se_sources=[{"label": "Bio SE - samtools", "site": "bioinformatics", "tag": "samtools", "tool": "samtools"}],
+    )
+
+    save_path = tmp_path / "bioinformatics.toml"
+    save_toml_config(config, save_path)
+    reloaded = load_toml_config(save_path)
+
+    assert reloaded.html_sources[0]["tool"] == "samtools"
+    assert reloaded.se_sources[0]["tool"] == "samtools"
+
+
+def test_save_toml_config_omits_tool_when_absent(tmp_path):
+    config = _valid_config(
+        html_sources=[{"label": "Harvard RC", "url": "https://example.com"}],
+    )
+
+    save_path = tmp_path / "gaussian.toml"
+    save_toml_config(config, save_path)
+    reloaded = load_toml_config(save_path)
+
+    assert "tool" not in reloaded.html_sources[0]
+
+
 def test_save_toml_config_creates_parent_directories(tmp_path):
     config = _valid_config()
     save_path = tmp_path / "nested" / "dir" / "gaussian.toml"

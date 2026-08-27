@@ -1,6 +1,6 @@
 ---
 name: discover-sources
-description: Use this skill whenever asked to find, discover, or search for new candidate documentation sources for one of gaussian-docs-scraper's research domains (e.g. Gaussian, bioinformatics, or any other domain with a configs/{domain}.toml file in this repo). Triggers on requests like "find new sources for gaussian", "discover more HPC documentation for bioinformatics", "look for sources to add to the scraper", "expand the source list", "/discover-sources gaussian", or similar -- even if the user doesn't say "discover" explicitly, use this skill whenever the intent is to grow the list of scraped sources for a domain. It searches the web for candidate HTML documentation pages, validates them with this repo's own check_sources.py tool, and writes a review-only proposal file. It does NOT edit configs/*.toml or presets.py directly -- do not use it if the user has already decided on specific URLs to add and just wants them added to a config; that's a direct edit, not a discovery task.
+description: Use this skill whenever asked to find, discover, or search for new candidate documentation sources for one of gaussian-docs-scraper's research domains (e.g. Gaussian, bioinformatics, or any other domain with a configs/{domain}.toml file in this repo) -- including sources for a specific tool within a domain, e.g. "find new samtools sources" or "discover sources for the bwa tool". Triggers on requests like "find new sources for gaussian", "discover more HPC documentation for bioinformatics", "look for sources to add to the scraper", "expand the source list", "find sources for the gatk tool", "/discover-sources gaussian", "/discover-sources bioinformatics samtools", or similar -- even if the user doesn't say "discover" explicitly, use this skill whenever the intent is to grow the list of scraped sources for a domain or a tool within one. It searches the web (and, when a tool is named, GitHub specifically) for candidate documentation pages, validates them with this repo's own check_sources.py tool, and writes a review-only proposal file. It does NOT edit configs/*.toml or presets.py directly -- do not use it if the user has already decided on specific URLs to add and just wants them added to a config; that's a direct edit, not a discovery task.
 ---
 
 # Discovering New Sources
@@ -19,6 +19,16 @@ in this repo yet (just a live tag-discovery helper used inside the interactive w
 with no comparable GOOD/WEAK/FAIL bar), so don't attempt to discover or validate SE tags
 here.
 
+**Optional tool scoping:** some domains -- bioinformatics especially -- aren't one
+cohesive topic, they're a collection of mostly-independent tools (samtools, bwa, gatk,
+...), often maintained by small academic projects whose only real documentation is a
+GitHub README rather than a polished HPC-center doc page. Rather than a separate domain
+per tool, this repo tags individual sources with an optional `tool` field and keeps them
+in one domain (see `configs/bioinformatics.toml` for examples). If the request names a
+specific tool (`/discover-sources bioinformatics samtools`, or "find new bwa sources"),
+run this skill in **tool-scoped mode** (steps marked accordingly below); otherwise run it
+domain-wide exactly as before, with no tool tag applied.
+
 ## Workflow
 
 ### 1. Load the domain's existing state
@@ -32,7 +42,9 @@ py -c "from pathlib import Path; from gaussian_scraper.config import load_toml_c
 (or read `configs/{domain}.toml` directly). Collect the domain's `keywords` and every
 existing `html_sources` URL -- this is the dedup baseline. Nothing already in the config
 should be re-proposed; that would just waste a search and a health check on something
-already decided.
+already decided. In tool-scoped mode, also note which existing sources already carry
+`tool = "{tool}"`, since those are the ones worth looking at for a feel for what's already
+covered for that specific tool.
 
 ### 2. Check for still-pending proposals from earlier runs
 
@@ -44,12 +56,24 @@ which just adds noise for the person reviewing it.
 
 ### 3. Search for candidates
 
-Use WebSearch to find roughly 5-10 new candidate documentation pages for the domain's
-topic, guided by its keywords. Look at the domain's *existing* sources first (from step 1)
-to get a feel for the pattern worth matching -- this repo's sources are consistently
-official university/HPC-center documentation pages (`.edu` domains, HPC center docs
-sites), not forums, blogs, or vendor marketing. Aim for that same tier of source. Exclude
-any URL already known from steps 1-2.
+**Domain-wide (no tool given):** Use WebSearch to find roughly 5-10 new candidate
+documentation pages for the domain's topic, guided by its keywords. Look at the domain's
+*existing* sources first (from step 1) to get a feel for the pattern worth matching --
+this repo's sources are consistently official university/HPC-center documentation pages
+(`.edu` domains, HPC center docs sites), not forums, blogs, or vendor marketing. Aim for
+that same tier of source. Exclude any URL already known from steps 1-2.
+
+**Tool-scoped (a tool was named):** Narrow the search to that specific tool's own name
+and real technical vocabulary rather than the domain's generic keywords -- e.g. for
+samtools that's terms like `sort`/`index`/`flagstat`/`cram`, not just "bioinformatics".
+**Also explicitly search for the tool's GitHub repository and wiki** (e.g. `"{tool}
+github"` or `"{tool} bioinformatics repository"`) as its own candidate, not only doc
+sites -- this is the main point of tool-scoping, since many small academic tools have no
+doc site at all, only a README. GitHub repo/wiki pages need no special handling: GitHub
+server-renders README content into plain `h1`-`h4`/`li`/`pre`/`p` tags, the same tags
+`fetch_page_text` already extracts from any HTML page, so they validate through
+`check_sources.py` exactly like any other URL (verified for real against
+`github.com/samtools/samtools`). Exclude any URL already known from step 1.
 
 ### 4. Validate every candidate
 
@@ -74,10 +98,12 @@ are GOOD"` summary line.
 ### 5. Write the proposal file
 
 Create (or append to, if run again same day) `discovery_candidates/{domain}_{YYYY-MM-DD}.md`
+(domain-wide) or `discovery_candidates/{domain}_{tool}_{YYYY-MM-DD}.md` (tool-scoped),
 using today's actual date, in this format:
 
 ```markdown
 # Discovered sources for {domain} -- {YYYY-MM-DD}
+<!-- tool-scoped runs: "# Discovered {tool} sources for {domain} -- {YYYY-MM-DD}" -->
 
 ## GOOD ({n})
 
@@ -89,7 +115,9 @@ using today's actual date, in this format:
 [[html_sources]]
 label = "{label}"
 url = "{url}"
+tool = "{tool}"
 \`\`\`
+<!-- omit the tool line entirely for domain-wide (non-tool-scoped) runs -->
 
 (repeat per GOOD candidate)
 
