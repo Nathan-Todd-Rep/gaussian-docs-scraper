@@ -275,3 +275,307 @@ def test_fetch_returns_none_when_pdf_parsing_raises(monkeypatch):
 
     assert text is None
     assert status == 200
+
+
+class _FakeDocxParagraph:
+    def __init__(self, text):
+        self.text = text
+
+
+class _FakeDocxCell:
+    def __init__(self, text):
+        self.text = text
+
+
+class _FakeDocxRow:
+    def __init__(self, cell_texts):
+        self.cells = [_FakeDocxCell(t) for t in cell_texts]
+
+
+class _FakeDocxTable:
+    def __init__(self, rows):
+        self.rows = [_FakeDocxRow(r) for r in rows]
+
+
+class _FakeDocxDocument:
+    def __init__(self, paragraph_texts, tables=None):
+        self.paragraphs = [_FakeDocxParagraph(t) for t in paragraph_texts]
+        self.tables = [_FakeDocxTable(r) for r in (tables or [])]
+
+
+def test_fetch_extracts_text_from_docx_via_content_type_header(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    import gaussian_scraper.fetcher as fetcher
+
+    monkeypatch.setattr(
+        fetcher,
+        "Document",
+        lambda docx_bytes: _FakeDocxDocument(["Load the Gaussian module before submitting your job."]),
+    )
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(
+            status_code=200,
+            content=b"PK-fake-docx-bytes",
+            headers={"Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+        ),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/download?id=123")
+
+    assert status == 200
+    assert "Load the Gaussian module" in text
+
+
+def test_fetch_extracts_text_from_docx_via_url_suffix(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    import gaussian_scraper.fetcher as fetcher
+
+    monkeypatch.setattr(
+        fetcher,
+        "Document",
+        lambda docx_bytes: _FakeDocxDocument(["Request memory carefully."], tables=[[["samtools sort"]]]),
+    )
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(status_code=200, content=b"PK-fake-docx-bytes", headers={}),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/guide.docx")
+
+    assert status == 200
+    assert "Request memory carefully" in text
+    assert "samtools sort" in text
+
+
+def test_fetch_returns_none_for_empty_docx_extraction(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    import gaussian_scraper.fetcher as fetcher
+
+    monkeypatch.setattr(fetcher, "Document", lambda docx_bytes: _FakeDocxDocument(["", ""]))
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(
+            status_code=200,
+            content=b"PK-fake-docx-bytes",
+            headers={"Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+        ),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/empty.docx")
+
+    assert text is None
+    assert status == 200
+
+
+def test_fetch_returns_none_when_docx_parsing_raises(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    import gaussian_scraper.fetcher as fetcher
+
+    def raise_on_parse(docx_bytes):
+        raise ValueError("corrupted docx")
+
+    monkeypatch.setattr(fetcher, "Document", raise_on_parse)
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(
+            status_code=200,
+            content=b"not-actually-a-docx",
+            headers={"Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+        ),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/corrupted.docx")
+
+    assert text is None
+    assert status == 200
+
+
+class _FakePptxTextFrame:
+    def __init__(self, text):
+        self.text = text
+
+
+class _FakePptxShape:
+    def __init__(self, text, has_text_frame=True):
+        self.has_text_frame = has_text_frame
+        if has_text_frame:
+            self.text_frame = _FakePptxTextFrame(text)
+
+
+class _FakePptxSlide:
+    def __init__(self, shape_texts):
+        self.shapes = [_FakePptxShape(t) for t in shape_texts]
+
+
+class _FakePptxPresentation:
+    def __init__(self, slides_shape_texts):
+        self.slides = [_FakePptxSlide(shapes) for shapes in slides_shape_texts]
+
+
+def test_fetch_extracts_text_from_pptx_via_content_type_header(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    import gaussian_scraper.fetcher as fetcher
+
+    monkeypatch.setattr(
+        fetcher,
+        "Presentation",
+        lambda pptx_bytes: _FakePptxPresentation([["Load the Gaussian module before submitting your job."]]),
+    )
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(
+            status_code=200,
+            content=b"PK-fake-pptx-bytes",
+            headers={"Content-Type": "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
+        ),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/download?id=456")
+
+    assert status == 200
+    assert "Load the Gaussian module" in text
+
+
+def test_fetch_extracts_text_from_pptx_via_url_suffix(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    import gaussian_scraper.fetcher as fetcher
+
+    monkeypatch.setattr(
+        fetcher,
+        "Presentation",
+        lambda pptx_bytes: _FakePptxPresentation([["Request memory carefully."], ["bwa mem alignment"]]),
+    )
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(status_code=200, content=b"PK-fake-pptx-bytes", headers={}),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/slides.pptx")
+
+    assert status == 200
+    assert "Request memory carefully" in text
+    assert "bwa mem alignment" in text
+
+
+def test_fetch_returns_none_for_empty_pptx_extraction(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    import gaussian_scraper.fetcher as fetcher
+
+    monkeypatch.setattr(fetcher, "Presentation", lambda pptx_bytes: _FakePptxPresentation([[""], [""]]))
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(
+            status_code=200,
+            content=b"PK-fake-pptx-bytes",
+            headers={"Content-Type": "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
+        ),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/empty.pptx")
+
+    assert text is None
+    assert status == 200
+
+
+def test_fetch_returns_none_when_pptx_parsing_raises(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    import gaussian_scraper.fetcher as fetcher
+
+    def raise_on_parse(pptx_bytes):
+        raise ValueError("corrupted pptx")
+
+    monkeypatch.setattr(fetcher, "Presentation", raise_on_parse)
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(
+            status_code=200,
+            content=b"not-actually-a-pptx",
+            headers={"Content-Type": "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
+        ),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/corrupted.pptx")
+
+    assert text is None
+    assert status == 200
+
+
+def test_fetch_extracts_text_from_txt_via_content_type_header(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(
+            status_code=200,
+            text="Load the Gaussian module before submitting your job.",
+            headers={"Content-Type": "text/plain"},
+        ),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/download?id=789")
+
+    assert status == 200
+    assert "Load the Gaussian module" in text
+
+
+def test_fetch_extracts_text_from_txt_via_url_suffix(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(
+            status_code=200,
+            text="Request memory carefully in your Slurm script.",
+            headers={},
+        ),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/readme.txt")
+
+    assert status == 200
+    assert "Request memory carefully" in text
+
+
+def test_fetch_returns_none_for_empty_txt(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(status_code=200, text="   ", headers={"Content-Type": "text/plain"}),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/empty.txt")
+
+    assert text is None
+    assert status == 200

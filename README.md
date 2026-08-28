@@ -8,7 +8,7 @@ A domain-agnostic scraper that collects HPC documentation and Stack Exchange pas
 
 It pulls content from two source types:
 
-- **Curated HPC documentation pages**: a seed list of trusted sites, filtered by Gaussian-related keywords. Sources can be regular HTML pages or PDFs (user manuals, workshop slides, HPC-specific guides) -- the fetcher detects which one a URL is automatically, no separate configuration needed.
+- **Curated HPC documentation pages**: a seed list of trusted sites, filtered by Gaussian-related keywords. Sources can be HTML pages, PDFs, Word docs, PowerPoint slides, or plain text (user manuals, workshop slides, HPC-specific guides) -- the fetcher detects which format a URL is automatically, no separate configuration needed.
 - **Chemistry Stack Exchange**: top-voted questions and accepted answers tagged with `gaussian`
 
 Passages are keyword-filtered and capped per source to keep the output focused. If a local [Ollama](https://ollama.com) instance is running, each source's passages are summarized before saving.
@@ -20,7 +20,7 @@ Passages are keyword-filtered and capped per source to keep the output focused. 
 Install dependencies:
 
 ```bash
-pip install requests beautifulsoup4 pypdf
+pip install requests beautifulsoup4 pypdf python-docx python-pptx
 ```
 
 ---

@@ -13,12 +13,13 @@ unreviewed source silently entering a dataset meant to be trustworthy would unde
 whole point of curating sources in the first place. This skill automates the *search*
 step only; deciding what actually gets added stays a deliberate human choice.
 
-**Scope:** `html_sources` entries only -- this covers both HTML pages and PDF documents
-(`fetch_page_text` auto-detects which one a URL is and extracts accordingly, no special
-handling needed either way). Stack Exchange tag sources (`se_sources`) aren't covered --
-there's no equivalent automated quality check for those in this repo yet (just a live
-tag-discovery helper used inside the interactive wizard, with no comparable GOOD/WEAK/FAIL
-bar), so don't attempt to discover or validate SE tags here.
+**Scope:** `html_sources` entries only -- this covers HTML pages, PDF, DOCX, PPTX, and
+plain text documents (`fetch_page_text` auto-detects which format a URL is and extracts
+accordingly, no special handling needed for any of them). Stack Exchange tag sources
+(`se_sources`) aren't covered -- there's no equivalent automated quality check for those
+in this repo yet (just a live tag-discovery helper used inside the interactive wizard,
+with no comparable GOOD/WEAK/FAIL bar), so don't attempt to discover or validate SE tags
+here.
 
 **Optional tool scoping:** some domains -- bioinformatics especially -- aren't one
 cohesive topic, they're a collection of mostly-independent tools (samtools, bwa, gatk,
@@ -62,10 +63,16 @@ documentation pages for the domain's topic, guided by its keywords. Look at the 
 *existing* sources first (from step 1) to get a feel for the pattern worth matching --
 this repo's sources are consistently official university/HPC-center documentation pages
 (`.edu` domains, HPC center docs sites), not forums, blogs, or vendor marketing. Aim for
-that same tier of source. PDF documents count too -- user manuals, workshop/tutorial
-slides, and HPC-center-specific PDF guides are valid candidates alongside HTML pages, no
-different treatment needed (a search like `"{topic} filetype:pdf site:edu"` can surface
-these). Exclude any URL already known from steps 1-2.
+that same tier of source. PDF, DOCX, and PPTX documents count too -- user manuals,
+workshop/tutorial slides, and HPC-center-specific guides in any of these formats are valid
+candidates alongside HTML pages, no different treatment needed (a search like
+`"{topic} filetype:pdf site:edu"`, swapping in `filetype:docx`/`filetype:pptx`, can surface
+these). Watch for ambiguous search terms matching an unrelated meaning of the same word
+(e.g. "Gaussian" is also a statistics/probability term unrelated to the Gaussian software)
+-- a high keyword-hit count from `check_sources.py` doesn't rule this out, since a
+document can be entirely on-topic for the *wrong* subject and still match repeatedly; only
+inspecting the actual extracted text catches it. Exclude any URL already known from
+steps 1-2.
 
 **Tool-scoped (a tool was named):** Narrow the search to that specific tool's own name
 and real technical vocabulary rather than the domain's generic keywords -- e.g. for
@@ -98,6 +105,17 @@ results into `GOOD` (>=10 keyword-hit lines, safe to add), `WEAK` (1-9 hits, on-
 thin, worth a human look), and `EMPTY`/`FAIL` (unusable -- no content or the page
 couldn't be fetched), each with the label/url/reason, ending in a `"{good}/{total} sources
 are GOOD"` summary line.
+
+**Don't stop at the hit count -- fetch and read the actual extracted text for every GOOD
+candidate before recommending it.** Real experience across many discovery batches: a
+passing keyword count doesn't reliably mean substantive content. Two distinct failure
+modes have shown up repeatedly, both invisible from the count alone: (1) thin catalog/stub
+pages that repeat keywords without saying anything (a page can score *higher* than a
+genuinely good one and still be a 6-line stub), and (2) topic-ambiguous terms matching an
+entirely unrelated document (e.g. "Gaussian" the chemistry software vs. "Gaussian" the
+statistics concept) -- the highest-scoring candidate in a batch has twice turned out to be
+the one to reject for exactly this reason. Fetch each GOOD candidate directly and describe
+what it actually contains before writing the proposal file.
 
 ### 5. Write the proposal file
 

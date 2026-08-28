@@ -5,6 +5,8 @@ from io import BytesIO
 
 import requests
 from bs4 import BeautifulSoup
+from docx import Document
+from pptx import Presentation
 from pypdf import PdfReader
 
 # How long to wait for a page to respond before giving up.
@@ -50,20 +52,64 @@ def _extract_pdf_text(pdf_bytes: bytes) -> str | None:
     return text if text.strip() else None
 
 
+def _extract_docx_text(docx_bytes: bytes) -> str | None:
+    """
+    Extract paragraph and table-cell text from a .docx's raw bytes. Same
+    "one line per fragment" contract and the same accepted extraction
+    limitations as _extract_pdf_text -- flattening a table to cell-by-
+    cell text loses its row/column structure, but per-line keyword
+    scoring downstream doesn't need that structure to find relevant text.
+    """
+    try:
+        document = Document(BytesIO(docx_bytes))
+        paragraphs = [p.text for p in document.paragraphs]
+        table_cells = [
+            cell.text
+            for table in document.tables
+            for row in table.rows
+            for cell in row.cells
+        ]
+        text = "\n".join(paragraphs + table_cells)
+    except Exception:
+        return None
+    return text if text.strip() else None
+
+
+def _extract_pptx_text(pptx_bytes: bytes) -> str | None:
+    """
+    Extract text from every text-bearing shape across all slides in a
+    .pptx. Speaker notes are deliberately not included -- slide content
+    is the analog of a page's visible text, notes are more like a
+    separate document.
+    """
+    try:
+        presentation = Presentation(BytesIO(pptx_bytes))
+        lines = [
+            shape.text_frame.text
+            for slide in presentation.slides
+            for shape in slide.shapes
+            if shape.has_text_frame
+        ]
+        text = "\n".join(lines)
+    except Exception:
+        return None
+    return text if text.strip() else None
+
+
 def fetch_page_text(url: str) -> tuple[str | None, int | None]:
     """
     Fetch a URL and return its visible text content as a plain string,
-    along with the HTTP status code for logging purposes. Handles both
-    HTML pages and PDF documents transparently -- callers don't need to
-    know which one a URL points to.
+    along with the HTTP status code for logging purposes. Handles HTML
+    pages, PDF, DOCX, PPTX, and plain text transparently -- callers don't
+    need to know which one a URL points to.
 
     Steps:
     - Wait briefly between requests to avoid rate limiting
     - Make an HTTP GET request with a realistic browser User-Agent header
-    - If the response is a PDF (by Content-Type or .pdf URL suffix),
-      extract its text directly from the raw bytes
-    - Otherwise, parse the HTML with BeautifulSoup and extract text only
-      from content-bearing tags
+    - Detect the response's actual format (by Content-Type or URL suffix)
+      and extract text the way that format needs: PDF/DOCX/PPTX are
+      parsed from raw bytes, plain text is used as-is, anything else
+      falls through to BeautifulSoup HTML parsing of content-bearing tags
     - Return a single string with one line per extracted piece
 
     Returns (None, None) if the request fails due to a network error.
@@ -85,8 +131,20 @@ def fetch_page_text(url: str) -> tuple[str | None, int | None]:
         return None, response.status_code
 
     content_type = response.headers.get("Content-Type", "")
-    if "application/pdf" in content_type or url.lower().endswith(".pdf"):
+    lower_url = url.lower()
+
+    if "application/pdf" in content_type or lower_url.endswith(".pdf"):
         return _extract_pdf_text(response.content), 200
+
+    if "wordprocessingml.document" in content_type or lower_url.endswith(".docx"):
+        return _extract_docx_text(response.content), 200
+
+    if "presentationml.presentation" in content_type or lower_url.endswith(".pptx"):
+        return _extract_pptx_text(response.content), 200
+
+    if "text/plain" in content_type or lower_url.endswith(".txt"):
+        text = response.text
+        return (text if text.strip() else None), 200
 
     soup = BeautifulSoup(response.text, "html.parser")
 
