@@ -138,7 +138,7 @@ Currently covers HTML sources only, not Stack Exchange tags.
 
 ## Output Format
 
-Each domain's data lives in its own SQLite database (`~/.inkly/{name}.db`), with
+Each domain's data is in its own SQLite database (`~/.inkly/{name}.db`), with
 two tables:
 
 - `sources`: one row per scraped source (`label`, `source_type` [`html`/`se`],
