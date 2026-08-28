@@ -579,3 +579,45 @@ def test_fetch_returns_none_for_empty_txt(monkeypatch):
 
     assert text is None
     assert status == 200
+
+
+def test_fetch_rejects_legacy_ppt_via_content_type_header(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(
+            status_code=200,
+            text="\x00\x01binary garbage that happens to contain gaussian somewhere",
+            content=b"\x00\x01binary garbage",
+            headers={"Content-Type": "application/vnd.ms-powerpoint"},
+        ),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/legacy.ppt")
+
+    assert text is None
+    assert status == 200
+
+
+def test_fetch_rejects_legacy_doc_via_url_suffix(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(
+            status_code=200,
+            text="\x00\x01binary garbage",
+            content=b"\x00\x01binary garbage",
+            headers={},
+        ),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/legacy.doc")
+
+    assert text is None
+    assert status == 200

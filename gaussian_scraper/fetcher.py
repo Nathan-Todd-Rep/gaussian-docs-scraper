@@ -108,8 +108,12 @@ def fetch_page_text(url: str) -> tuple[str | None, int | None]:
     - Make an HTTP GET request with a realistic browser User-Agent header
     - Detect the response's actual format (by Content-Type or URL suffix)
       and extract text the way that format needs: PDF/DOCX/PPTX are
-      parsed from raw bytes, plain text is used as-is, anything else
-      falls through to BeautifulSoup HTML parsing of content-bearing tags
+      parsed from raw bytes, plain text is used as-is, legacy binary
+      Office formats (.doc/.ppt/.xls) are explicitly rejected as
+      unextractable (not OOXML, not HTML -- parsing them as HTML would
+      produce garbled text that can spuriously match keywords), and
+      anything else falls through to BeautifulSoup HTML parsing of
+      content-bearing tags
     - Return a single string with one line per extracted piece
 
     Returns (None, None) if the request fails due to a network error.
@@ -145,6 +149,18 @@ def fetch_page_text(url: str) -> tuple[str | None, int | None]:
     if "text/plain" in content_type or lower_url.endswith(".txt"):
         text = response.text
         return (text if text.strip() else None), 200
+
+    # Legacy pre-2007 binary Office formats (.doc/.ppt/.xls) aren't OOXML,
+    # so they don't match the docx/pptx branches above and aren't valid
+    # HTML either -- without this check they'd silently fall through to
+    # BeautifulSoup, which parses the binary bytes as if they were HTML
+    # text and can produce garbled "content" that coincidentally contains
+    # keyword substrings, scoring as a false GOOD instead of correctly
+    # coming back as unextractable (same as an image-only PDF).
+    legacy_office_types = ("application/msword", "application/vnd.ms-powerpoint", "application/vnd.ms-excel")
+    legacy_office_suffixes = (".doc", ".ppt", ".xls")
+    if any(t in content_type for t in legacy_office_types) or lower_url.endswith(legacy_office_suffixes):
+        return None, 200
 
     soup = BeautifulSoup(response.text, "html.parser")
 
