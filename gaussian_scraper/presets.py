@@ -430,6 +430,301 @@ BIOINFORMATICS_PRESET = {
             "label": "VCRU Wisconsin - Platanus README.txt",
             "url": "https://vcru.wisc.edu/simonlab/bioinformatics/programs/platanus/README.txt",
         },
+        {
+            "label": "Babraham Bioinformatics - FastQC",
+            "url": "https://www.bioinformatics.babraham.ac.uk/projects/fastqc/",
+            "tool": "fastqc",
+        },
+        {
+            "label": "GitHub - s-andrews/FastQC",
+            "url": "https://github.com/s-andrews/FastQC",
+            "tool": "fastqc",
+        },
+        {
+            "label": "Bucknell BisonNet - FastQC Guide (PDF)",
+            "url": "https://bisonnet.bucknell.edu/files/2021/02/FASTQC-Help-Page-Final.pdf",
+            "tool": "fastqc",
+        },
+        {
+            "label": "Missouri Genomics Core - FastQC Manual (PDF)",
+            "url": "https://mugenomicscore.missouri.edu/PDF/FastQC_Manual.pdf",
+            "tool": "fastqc",
+        },
+        {
+            "label": "MSU RTSF - FastQC Tutorial and FAQ (PDF)",
+            "url": "https://rtsf.natsci.msu.edu/sites/_rtsf/assets/File/FastQC_TutorialAndFAQ_080717.pdf",
+            "tool": "fastqc",
+        },
+        {
+            "label": "USADELLAB - Trimmomatic Manual V0.32 (PDF)",
+            "url": "http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf",
+            "tool": "trimmomatic",
+        },
+        {
+            "label": "Ohio Supercomputer Center - Trimmomatic",
+            "url": "https://www.osc.edu/resources/available_software/software_list/trimmomatic",
+            "tool": "trimmomatic",
+        },
+        {
+            "label": "CyVerse - Trimmomatic Quick Start",
+            "url": "https://cyverse-trimmomatic-quickstart.readthedocs-hosted.com/en/latest/",
+            "tool": "trimmomatic",
+        },
+        {
+            "label": "Data Carpentry - Trimming and Filtering",
+            "url": "https://datacarpentry.github.io/wrangling-genomics/03-trimming.html",
+            "tool": "trimmomatic",
+        },
+        {
+            "label": "NIH HPC (Biowulf) - Trimmomatic",
+            "url": "https://hpc.nih.gov/apps/trimmomatic.html",
+            "tool": "trimmomatic",
+        },
+        {
+            "label": "UT Austin Core NGS Tools - Pre-processing Raw Sequences",
+            "url": "https://cloud.wikis.utexas.edu/wiki/spaces/CoreNGSTools/pages/54068284/2021+Pre-processing+raw+sequences",
+            "tool": "cutadapt",
+        },
+        {
+            "label": "UNL HCC - cutadapt",
+            "url": "https://hcc.unl.edu/docs/applications/app_specific/bioinformatics_tools/pre_processing_tools/cutadapt",
+            "tool": "cutadapt",
+        },
+        {
+            "label": "Emory Cores - MicroRNAseq Processing Pipeline (PDF)",
+            "url": "https://www.cores.emory.edu/eicc/_includes/documents/sections/resources/miRNAseq_HRJ.pdf",
+            "tool": "cutadapt",
+        },
+        {
+            "label": "Augusta University HPC - cutadapt",
+            "url": "https://auhpcs.augusta.edu/user-kb/applications/cutadapt.html",
+            "tool": "cutadapt",
+        },
+        {
+            "label": "HBC Training (Harvard Chan Bioinformatics Core) - MultiQC Lesson",
+            "url": "https://hbctraining.github.io/Intro-to-rnaseq-fasrc-salmon-flipped/lessons/11_multiQC.html",
+            "tool": "multiqc",
+        },
+        {
+            "label": "UT Austin BioITeam - Using MultiQC",
+            "url": "https://cloud.wikis.utexas.edu/wiki/display/bioiteam/Using+MultiQC",
+            "tool": "multiqc",
+        },
+        {
+            "label": "Bowtie2 GitHub (BenLangmead)",
+            "url": "https://github.com/BenLangmead/bowtie2",
+            "tool": "bowtie2",
+        },
+        {
+            "label": "Bowtie2 MANUAL (raw GitHub)",
+            "url": "https://raw.githubusercontent.com/BenLangmead/bowtie2/master/MANUAL",
+            "tool": "bowtie2",
+        },
+        {
+            "label": "UGA GACRC - Bowtie2 Teaching",
+            "url": "https://wiki.gacrc.uga.edu/wiki/Bowtie2-Teaching",
+            "tool": "bowtie2",
+        },
+        {
+            "label": "UMN Biostat - Intro to Linux and Bowtie (PDF)",
+            "url": "http://www.biostat.umn.edu/~cavanr/NGSlecture3pubh74452016.pdf",
+            "tool": "bowtie2",
+        },
+        {
+            "label": "STAR Manual source (raw GitHub .tex)",
+            "url": "https://raw.githubusercontent.com/alexdobin/STAR/master/extras/doc-latex/STARmanual.tex",
+            "tool": "star",
+        },
+        {
+            "label": "Cornell Physiology - STAR Manual mirror (PDF)",
+            "url": "https://physiology.med.cornell.edu/faculty/skrabanek/lab/angsd/lecture_notes/STARmanual.pdf",
+            "tool": "star",
+        },
+        {
+            "label": "Harvard HBC Training - Alignment with STAR",
+            "url": "https://hbctraining.github.io/Intro-to-rnaseq-hpc-O2/lessons/03_alignment.html",
+            "tool": "star",
+        },
+        {
+            "label": "Cornell BioHPC - RNA-Seq Exercise 1: STAR/TopHat (PDF)",
+            "url": "https://biohpc.cornell.edu/doc/RNA-Seq-2017-exercise1.pdf",
+            "tool": "star",
+        },
+        {
+            "label": "Cornell BioHPC - RNA-Seq Exercise 2 (PDF)",
+            "url": "https://biohpc.cornell.edu/doc/RNA-Seq-2017-exercise2.pdf",
+            "tool": "star",
+        },
+        {
+            "label": "UCLA QCB - Intro to RNAseq Day 3 (PDF)",
+            "url": "https://qcb.ucla.edu/wp-content/uploads/sites/14/2020/04/RNAseq1-day3.pdf",
+            "tool": "star",
+        },
+        {
+            "label": "HISAT2 GitHub (DaehwanKimLab)",
+            "url": "https://github.com/DaehwanKimLab/hisat2",
+            "tool": "hisat2",
+        },
+        {
+            "label": "HISAT2 MANUAL (raw GitHub)",
+            "url": "https://raw.githubusercontent.com/DaehwanKimLab/hisat2/master/MANUAL",
+            "tool": "hisat2",
+        },
+        {
+            "label": "CU Boulder - HISAT2 Worksheet (PDF)",
+            "url": "https://biodatasci.colorado.edu/static/sr2019/6_RNA-seq/6_worksheet_6.1_HISAT2.pdf",
+            "tool": "hisat2",
+        },
+        {
+            "label": "UND Genomics Core - RNA-seq Alignment Workshop (PDF)",
+            "url": "https://med.und.edu/research/genomics-core/_files/docs/workshop-2019-rnaseq-alignment-handson.pdf",
+            "tool": "hisat2",
+        },
+        {
+            "label": "BCFtools GitHub",
+            "url": "https://github.com/samtools/bcftools",
+            "tool": "bcftools",
+        },
+        {
+            "label": "BCFtools Manual Page",
+            "url": "https://samtools.github.io/bcftools/bcftools.html",
+            "tool": "bcftools",
+        },
+        {
+            "label": "Cornell BioHPC - Variant Calling Workshop Part 2 (PDF)",
+            "url": "https://biohpc.cornell.edu/lab/doc/variant_workshop_part2.pdf",
+            "tool": "bcftools",
+        },
+        {
+            "label": "UConn Bioinformatics - Data Therapy Variants (PDF)",
+            "url": "https://bioinformatics.uconn.edu/wp-content/uploads/sites/15/2018/03/DataTherapy_Variants_2018week04.pdf",
+            "tool": "bcftools",
+        },
+        {
+            "label": "Picard Tools - Broad Institute",
+            "url": "https://broadinstitute.github.io/picard/",
+            "tool": "picard",
+        },
+        {
+            "label": "Picard - Tool Documentation Overview",
+            "url": "http://broadinstitute.github.io/picard/command-line-overview.html",
+            "tool": "picard",
+        },
+        {
+            "label": "CSC Docs - Picard",
+            "url": "https://docs.csc.fi/apps/picard/",
+            "tool": "picard",
+        },
+        {
+            "label": "QMUL - Intro to HPC Tutorials MSc Bioinformatics (PDF)",
+            "url": "https://learn.hpc.qmul.ac.uk/assets/MSc_Bioinformatics.pdf",
+            "tool": "picard",
+        },
+        {
+            "label": "GATK Broad - MarkDuplicates (Picard)",
+            "url": "https://gatk.broadinstitute.org/hc/en-us/articles/360037052812-MarkDuplicates-Picard",
+            "tool": "picard",
+        },
+        {
+            "label": "VCFtools GitHub",
+            "url": "https://github.com/vcftools/vcftools",
+            "tool": "vcftools",
+        },
+        {
+            "label": "VCFtools Manual",
+            "url": "https://vcftools.github.io/man_latest.html",
+            "tool": "vcftools",
+        },
+        {
+            "label": "QMUL HPC - VCFtools",
+            "url": "https://docs.hpc.qmul.ac.uk/apps/bio/vcftools/",
+            "tool": "vcftools",
+        },
+        {
+            "label": "UF HPC - VCFtools",
+            "url": "https://docs.rc.ufl.edu/software/apps/vcftools",
+            "tool": "vcftools",
+        },
+        {
+            "label": "Sheffield HPC - VCFtools",
+            "url": "https://docs.hpc.shef.ac.uk/en/latest/stanage/software/stacks/el7-icelake-znver-stanage/Bio/VCFtools.html",
+            "tool": "vcftools",
+        },
+        {
+            "label": "Salmon GitHub",
+            "url": "https://github.com/COMBINE-lab/salmon",
+            "tool": "salmon",
+        },
+        {
+            "label": "Salmon ReadTheDocs Manual",
+            "url": "https://salmon.readthedocs.io/en/latest/salmon.html",
+            "tool": "salmon",
+        },
+        {
+            "label": "ANGUS Workshop - Salmon Quant Tutorial",
+            "url": "https://angus.readthedocs.io/en/2019/salmon-quant.html",
+            "tool": "salmon",
+        },
+        {
+            "label": "NYU Genomics Core - Salmon & kallisto",
+            "url": "https://gencore.bio.nyu.edu/salmon-kallisto-rapid-transcript-quantification-for-rna-seq-data/",
+            "tool": "salmon",
+        },
+        {
+            "label": "kallisto GitHub",
+            "url": "https://github.com/pachterlab/kallisto",
+            "tool": "kallisto",
+        },
+        {
+            "label": "kallisto Manual",
+            "url": "https://pachterlab.github.io/kallisto/manual",
+            "tool": "kallisto",
+        },
+        {
+            "label": "Rsubread/Subread Users Guide (PDF)",
+            "url": "https://bioconductor.org/packages/release/bioc/vignettes/Rsubread/inst/doc/SubreadUsersGuide.pdf",
+            "tool": "featurecounts",
+        },
+        {
+            "label": "SPAdes GitHub",
+            "url": "https://github.com/ablab/spades",
+            "tool": "spades",
+        },
+        {
+            "label": "SPAdes Quick Start",
+            "url": "https://ablab.github.io/spades/getting-started.html",
+            "tool": "spades",
+        },
+        {
+            "label": "UT Austin BioITeam - SPAdes Genome Assembly Tutorial",
+            "url": "https://cloud.wikis.utexas.edu/wiki/spaces/bioiteam/pages/47728891",
+            "tool": "spades",
+        },
+        {
+            "label": "BEDTools Official Docs (ReadTheDocs)",
+            "url": "https://bedtools.readthedocs.io/en/latest/content/overview.html",
+            "tool": "bedtools",
+        },
+        {
+            "label": "UT Austin BioITeam - BEDTools Tutorial",
+            "url": "https://wikis.utexas.edu/display/bioiteam/Bedtools+tutorial+--+GVA2020",
+            "tool": "bedtools",
+        },
+        {
+            "label": "UVA BIOL4230 - BEDTools Lecture (PDF)",
+            "url": "https://fasta.bioch.virginia.edu/biol4230/lects/biol4230_29_BedTools.pdf",
+            "tool": "bedtools",
+        },
+        {
+            "label": "UT Austin BioITeam - IGV Tutorial",
+            "url": "https://wikis.utexas.edu/display/bioiteam/Integrative+Genomics+Viewer+(IGV)+tutorial",
+            "tool": "igv",
+        },
+        {
+            "label": "RNA-Bio (Broad Institute) - IGV Tutorial (PDF)",
+            "url": "https://rnabio.org/assets/module_2/IGV_Tutorial_Long_BroadInstitute.pdf",
+            "tool": "igv",
+        },
     ],
     "se_sources": [
         {
