@@ -97,6 +97,14 @@ GAUSSIAN_PRESET = {
             "label": "Flinders DeepThought - Gaussian",
             "url": "https://deepthoughtdocs.flinders.edu.au/en/develop/software/gaussian16.html",
         },
+        {
+            "label": "William and Mary - Gaussian",
+            "url": "https://www.wm.edu/offices/it/services/researchcomputing/using/software/gaussian/",
+        },
+        {
+            "label": "Delaware IT-RCI - Gaussian on Darwin",
+            "url": "https://docs.hpc.udel.edu/software/gaussian/darwin",
+        },
     ],
     "se_sources": [
         {
@@ -189,6 +197,69 @@ BIOINFORMATICS_PRESET = {
             "label": "OSG Connect - BWA Tutorial",
             "url": "https://github.com/OSGConnect/tutorial-bwa",
             "tool": "bwa",
+        },
+        {
+            "label": "QMUL HPC - Samtools",
+            "url": "https://docs.hpc.qmul.ac.uk/apps/bio/samtools/",
+            "tool": "samtools",
+        },
+        {
+            "label": "NCSA UIUC - Samtools",
+            "url": "https://docs.ncsa.illinois.edu/en/latest/software/bio/samtools.html",
+            "tool": "samtools",
+        },
+        {
+            "label": "FSU RCC - BWA",
+            "url": "https://docs.rcc.fsu.edu/software/bwa/",
+            "tool": "bwa",
+        },
+        {
+            "label": "HPC @ QMUL - BWA",
+            "url": "https://docs.hpc.qmul.ac.uk/apps/bio/bwa/",
+            "tool": "bwa",
+        },
+        {
+            "label": "CSC Docs - BWA",
+            "url": "https://docs.csc.fi/apps/bwa/",
+            "tool": "bwa",
+        },
+        {
+            "label": "USC CARC - GATK",
+            "url": "https://www.carc.usc.edu/user-guides/life-sciences-computing/software-packages/gatk",
+            "tool": "gatk",
+        },
+        {
+            "label": "UWEC Blugold HPC - BLAST",
+            "url": "https://docs.hpc.uwec.edu/software/guides/blast/",
+            "tool": "blast",
+        },
+        {
+            "label": "MSU ICER - BLAST+",
+            "url": "https://docs.icer.msu.edu/BLAST_BLAST+_with_Multiple_Processors/",
+            "tool": "blast",
+        },
+        {
+            "label": "UGA GACRC - BLAST+ Teaching",
+            "url": "https://wiki.gacrc.uga.edu/wiki/BLAST+-Teaching",
+            "tool": "blast",
+        },
+        {
+            "label": "Iowa State Pronto - BLAST",
+            "url": "https://research.it.iastate.edu/guides/pronto/bioinformatics/blast/",
+            "tool": "blast",
+        },
+        {
+            "label": "NC State HPC - BLAST",
+            "url": "https://hpc.ncsu.edu/Software/Apps.php?app=BLAST",
+            "tool": "blast",
+        },
+        {
+            "label": "Purdue RCAC - HPC Orientation for Biologists",
+            "url": "https://docs.rcac.purdue.edu/lifesciences/guides/hpc-orientation/",
+        },
+        {
+            "label": "Harvard FAS - Snakemake Workshop",
+            "url": "https://informatics.fas.harvard.edu/workshops/snakemake/run/",
         },
         {
             "label": "Ohio Supercomputer Center - BWA",

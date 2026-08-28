@@ -70,6 +70,14 @@ url = "https://docs.hpc2n.umu.se/software/apps/gaussian/"
 label = "Flinders DeepThought - Gaussian"
 url = "https://deepthoughtdocs.flinders.edu.au/en/develop/software/gaussian16.html"
 
+[[html_sources]]
+label = "William and Mary - Gaussian"
+url = "https://www.wm.edu/offices/it/services/researchcomputing/using/software/gaussian/"
+
+[[html_sources]]
+label = "Delaware IT-RCI - Gaussian on Darwin"
+url = "https://docs.hpc.udel.edu/software/gaussian/darwin"
+
 [[se_sources]]
 label = "Matter Modeling Stack Exchange - gaussian tag"
 site = "mattermodeling"

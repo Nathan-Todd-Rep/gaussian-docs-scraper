@@ -18,6 +18,69 @@ url = "https://github.com/OSGConnect/tutorial-bwa"
 tool = "bwa"
 
 [[html_sources]]
+label = "QMUL HPC - Samtools"
+url = "https://docs.hpc.qmul.ac.uk/apps/bio/samtools/"
+tool = "samtools"
+
+[[html_sources]]
+label = "NCSA UIUC - Samtools"
+url = "https://docs.ncsa.illinois.edu/en/latest/software/bio/samtools.html"
+tool = "samtools"
+
+[[html_sources]]
+label = "FSU RCC - BWA"
+url = "https://docs.rcc.fsu.edu/software/bwa/"
+tool = "bwa"
+
+[[html_sources]]
+label = "HPC @ QMUL - BWA"
+url = "https://docs.hpc.qmul.ac.uk/apps/bio/bwa/"
+tool = "bwa"
+
+[[html_sources]]
+label = "CSC Docs - BWA"
+url = "https://docs.csc.fi/apps/bwa/"
+tool = "bwa"
+
+[[html_sources]]
+label = "USC CARC - GATK"
+url = "https://www.carc.usc.edu/user-guides/life-sciences-computing/software-packages/gatk"
+tool = "gatk"
+
+[[html_sources]]
+label = "UWEC Blugold HPC - BLAST"
+url = "https://docs.hpc.uwec.edu/software/guides/blast/"
+tool = "blast"
+
+[[html_sources]]
+label = "MSU ICER - BLAST+"
+url = "https://docs.icer.msu.edu/BLAST_BLAST+_with_Multiple_Processors/"
+tool = "blast"
+
+[[html_sources]]
+label = "UGA GACRC - BLAST+ Teaching"
+url = "https://wiki.gacrc.uga.edu/wiki/BLAST+-Teaching"
+tool = "blast"
+
+[[html_sources]]
+label = "Iowa State Pronto - BLAST"
+url = "https://research.it.iastate.edu/guides/pronto/bioinformatics/blast/"
+tool = "blast"
+
+[[html_sources]]
+label = "NC State HPC - BLAST"
+url = "https://hpc.ncsu.edu/Software/Apps.php?app=BLAST"
+tool = "blast"
+
+[[html_sources]]
+label = "Purdue RCAC - HPC Orientation for Biologists"
+url = "https://docs.rcac.purdue.edu/lifesciences/guides/hpc-orientation/"
+
+[[html_sources]]
+label = "Harvard FAS - Snakemake Workshop"
+url = "https://informatics.fas.harvard.edu/workshops/snakemake/run/"
+
+[[html_sources]]
 label = "Ohio Supercomputer Center - BWA"
 url = "https://www.osc.edu/resources/available_software/software_list/bwa"
 
