@@ -113,6 +113,34 @@ GAUSSIAN_PRESET = {
             "label": "MSU ICER - Computational Quantum Chemistry Tools (PDF)",
             "url": "https://docs.icer.msu.edu/attachments/Computational_Quantum_Chemistry_Tools.pdf",
         },
+        {
+            "label": "UBA - GaussView/Gaussian Guide and Exercise Manual (PDF)",
+            "url": "http://users.df.uba.ar/rboc/em3/GAUSSIAN_TRAIN.pdf",
+        },
+        {
+            "label": "Tel Aviv Uni - Gaussian Manual (PDF)",
+            "url": "https://www.tau.ac.il/~ephraim/Gaussian_manual.pdf",
+        },
+        {
+            "label": "Illinois Pogorelov Lab - Gaussian Intro Tutorial (PDF)",
+            "url": "http://pogorelov.scs.illinois.edu/wp-content/uploads/2020/06/qm-gaussian-intro-1-tutorial-PogorelovLab.2011.v1.web_.pdf",
+        },
+        {
+            "label": "Illinois SCS - Gaussian Intro 2 (PDF)",
+            "url": "https://scs.illinois.edu/system/files/inline-files/gaussian-intro-2.pdf",
+        },
+        {
+            "label": "Texas A&M - Computational Chemistry Handout (PDF)",
+            "url": "https://www.chem.tamu.edu/class/majors/chem101h-lab/chem/Computational%20Chemistry%20Handout%20-%202016.pdf",
+        },
+        {
+            "label": "UW Faculty - Computational Chemistry Tutorial (PDF)",
+            "url": "https://faculty.washington.edu/tingcao/wordpress/wp-content/uploads/2020/05/Comp_Chem_Tutorial__Spr2020.pdf",
+        },
+        {
+            "label": "Illinois SCS - Gaussian GaussView Tutorial (PDF)",
+            "url": "https://scs.illinois.edu/system/files/inline-files/SCS-Gaussian-GaussView-tutorial_1.pdf",
+        },
     ],
     "se_sources": [
         {
