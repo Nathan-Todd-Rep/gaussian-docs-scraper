@@ -152,7 +152,7 @@ def test_fetch_extracts_text_from_html(monkeypatch):
     monkeypatch.setattr(
         requests,
         "get",
-        lambda *a, **kw: SimpleNamespace(status_code=200, text=fake_html),
+        lambda *a, **kw: SimpleNamespace(status_code=200, text=fake_html, headers={}),
     )
 
     text, status = fetch_page_text("http://fake-url.example.com")
@@ -163,3 +163,115 @@ def test_fetch_extracts_text_from_html(monkeypatch):
     assert "Request memory carefully" in text
     assert "Skip this nav content" not in text
     assert "Skip this footer" not in text
+
+
+class _FakePdfPage:
+    def __init__(self, text):
+        self._text = text
+
+    def extract_text(self):
+        return self._text
+
+
+class _FakePdfReader:
+    def __init__(self, pages_text):
+        self.pages = [_FakePdfPage(t) for t in pages_text]
+
+
+def test_fetch_extracts_text_from_pdf_via_content_type_header(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    import gaussian_scraper.fetcher as fetcher
+
+    monkeypatch.setattr(
+        fetcher,
+        "PdfReader",
+        lambda pdf_bytes: _FakePdfReader(["Load the Gaussian module before submitting your job."]),
+    )
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(
+            status_code=200,
+            content=b"%PDF-fake-bytes",
+            headers={"Content-Type": "application/pdf"},
+        ),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/download?id=123")
+
+    assert status == 200
+    assert "Load the Gaussian module" in text
+
+
+def test_fetch_extracts_text_from_pdf_via_url_suffix(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    import gaussian_scraper.fetcher as fetcher
+
+    monkeypatch.setattr(
+        fetcher,
+        "PdfReader",
+        lambda pdf_bytes: _FakePdfReader(["Request memory carefully in your Slurm script."]),
+    )
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(status_code=200, content=b"%PDF-fake-bytes", headers={}),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/guide.pdf")
+
+    assert status == 200
+    assert "Request memory carefully" in text
+
+
+def test_fetch_returns_none_for_empty_pdf_extraction(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    import gaussian_scraper.fetcher as fetcher
+
+    monkeypatch.setattr(fetcher, "PdfReader", lambda pdf_bytes: _FakePdfReader(["", ""]))
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(
+            status_code=200,
+            content=b"%PDF-fake-bytes",
+            headers={"Content-Type": "application/pdf"},
+        ),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/scanned.pdf")
+
+    assert text is None
+    assert status == 200
+
+
+def test_fetch_returns_none_when_pdf_parsing_raises(monkeypatch):
+    import requests
+    from types import SimpleNamespace
+
+    import gaussian_scraper.fetcher as fetcher
+
+    def raise_on_parse(pdf_bytes):
+        raise ValueError("corrupted PDF")
+
+    monkeypatch.setattr(fetcher, "PdfReader", raise_on_parse)
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **kw: SimpleNamespace(
+            status_code=200,
+            content=b"not-actually-a-pdf",
+            headers={"Content-Type": "application/pdf"},
+        ),
+    )
+
+    text, status = fetch_page_text("http://fake-url.example.com/corrupted.pdf")
+
+    assert text is None
+    assert status == 200

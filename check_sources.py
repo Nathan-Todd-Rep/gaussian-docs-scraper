@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Vet candidate HTML sources before adding them to a preset or config.
+Vet candidate sources (HTML pages or PDFs) before adding them to a preset or config.
 
 Replaces manual curl + grep vetting with a repeatable, automated check.
 Each URL is fetched and classified as GOOD, WEAK, EMPTY, or FAIL based on
 how many lines match the given keywords -- the same bar we've been
 applying by hand when building the Gaussian and Bioinformatics presets.
+PDF and HTML URLs are handled identically; fetch_page_text detects which
+one it's looking at automatically.
 
 Usage:
 

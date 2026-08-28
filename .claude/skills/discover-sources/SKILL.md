@@ -13,11 +13,12 @@ unreviewed source silently entering a dataset meant to be trustworthy would unde
 whole point of curating sources in the first place. This skill automates the *search*
 step only; deciding what actually gets added stays a deliberate human choice.
 
-**Scope:** HTML documentation sources (`html_sources`) only. Stack Exchange tag sources
-(`se_sources`) aren't covered -- there's no equivalent automated quality check for those
-in this repo yet (just a live tag-discovery helper used inside the interactive wizard,
-with no comparable GOOD/WEAK/FAIL bar), so don't attempt to discover or validate SE tags
-here.
+**Scope:** `html_sources` entries only -- this covers both HTML pages and PDF documents
+(`fetch_page_text` auto-detects which one a URL is and extracts accordingly, no special
+handling needed either way). Stack Exchange tag sources (`se_sources`) aren't covered --
+there's no equivalent automated quality check for those in this repo yet (just a live
+tag-discovery helper used inside the interactive wizard, with no comparable GOOD/WEAK/FAIL
+bar), so don't attempt to discover or validate SE tags here.
 
 **Optional tool scoping:** some domains -- bioinformatics especially -- aren't one
 cohesive topic, they're a collection of mostly-independent tools (samtools, bwa, gatk,
@@ -61,7 +62,10 @@ documentation pages for the domain's topic, guided by its keywords. Look at the 
 *existing* sources first (from step 1) to get a feel for the pattern worth matching --
 this repo's sources are consistently official university/HPC-center documentation pages
 (`.edu` domains, HPC center docs sites), not forums, blogs, or vendor marketing. Aim for
-that same tier of source. Exclude any URL already known from steps 1-2.
+that same tier of source. PDF documents count too -- user manuals, workshop/tutorial
+slides, and HPC-center-specific PDF guides are valid candidates alongside HTML pages, no
+different treatment needed (a search like `"{topic} filetype:pdf site:edu"` can surface
+these). Exclude any URL already known from steps 1-2.
 
 **Tool-scoped (a tool was named):** Narrow the search to that specific tool's own name
 and real technical vocabulary rather than the domain's generic keywords -- e.g. for

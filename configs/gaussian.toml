@@ -78,6 +78,14 @@ url = "https://www.wm.edu/offices/it/services/researchcomputing/using/software/g
 label = "Delaware IT-RCI - Gaussian on Darwin"
 url = "https://docs.hpc.udel.edu/software/gaussian/darwin"
 
+[[html_sources]]
+label = "UTEP - Gaussian16 HPC Usage Guide (PDF)"
+url = "https://www.utep.edu/information-resources/research/resources/hpc%20usage%20guide%20for%20gaussian%2016%20on%20jakar.docx.pdf"
+
+[[html_sources]]
+label = "MSU ICER - Computational Quantum Chemistry Tools (PDF)"
+url = "https://docs.icer.msu.edu/attachments/Computational_Quantum_Chemistry_Tools.pdf"
+
 [[se_sources]]
 label = "Matter Modeling Stack Exchange - gaussian tag"
 site = "mattermodeling"
