@@ -725,6 +725,41 @@ BIOINFORMATICS_PRESET = {
             "url": "https://rnabio.org/assets/module_2/IGV_Tutorial_Long_BroadInstitute.pdf",
             "tool": "igv",
         },
+        {
+            "label": "GitHub - marcelm/cutadapt",
+            "url": "https://github.com/marcelm/cutadapt/",
+            "tool": "cutadapt",
+        },
+        {
+            "label": "GitHub - MultiQC/MultiQC",
+            "url": "https://github.com/MultiQC/MultiQC",
+            "tool": "multiqc",
+        },
+        {
+            "label": "STAR GitHub (alexdobin)",
+            "url": "https://github.com/alexdobin/STAR",
+            "tool": "star",
+        },
+        {
+            "label": "BEDTools2 GitHub (arq5x)",
+            "url": "https://github.com/arq5x/bedtools2",
+            "tool": "bedtools",
+        },
+        {
+            "label": "Cornell BioHPC - featureCounts",
+            "url": "https://biohpc.cornell.edu/lab/userguide.aspx?a=software&i=856",
+            "tool": "featurecounts",
+        },
+        {
+            "label": "CU Boulder BioDataSci - featureCounts Worksheet (PDF)",
+            "url": "https://biodatasci.colorado.edu/static/sr2023/07_counting_deseq/Day7_featurecounts_worksheet.pdf",
+            "tool": "featurecounts",
+        },
+        {
+            "label": "BCFtools HowTo - Variant Calling",
+            "url": "https://samtools.github.io/bcftools/howtos/variant-calling.html",
+            "tool": "bcftools",
+        },
     ],
     "se_sources": [
         {
