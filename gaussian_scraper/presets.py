@@ -270,6 +270,67 @@ BIOINFORMATICS_PRESET = {
             "url": "https://informatics.fas.harvard.edu/workshops/snakemake/run/",
         },
         {
+            "label": "Glasgow Uni - BWA Tutorial (PDF)",
+            "url": "https://userweb.eng.gla.ac.uk/umer.ijaz/bioinformatics/BWA_tutorial.pdf",
+            "tool": "bwa",
+        },
+        {
+            "label": "Evomics - Alignment Workshop 2022 (PDF)",
+            "url": "https://evomics.org/wp-content/uploads/2022/05/Alignment-Workshop-2022.pdf",
+            "tool": "bwa",
+        },
+        {
+            "label": "CRUK Bioinformatics - Sequence Alignment with BWA (PDF)",
+            "url": "http://bioinformatics-core-shared-training.github.io/cruk-bioinf-sschool/Day1/Sequence%20Alignment_July2015_ShamithSamarajiwa.pdf",
+            "tool": "bwa",
+        },
+        {
+            "label": "UBC MICB405 - BWA SAMtools BCFtools Tutorial (PDF)",
+            "url": "https://educe-ubc.github.io/MICB405/slides/tutorials/samtools_bcftools.pdf",
+            "tool": "samtools",
+        },
+        {
+            "label": "UCLA QCB - GATK Primer (PDF)",
+            "url": "https://qcb.ucla.edu/wp-content/uploads/sites/14/2016/03/GATKwr12-1-GATK_primer.pdf",
+            "tool": "gatk",
+        },
+        {
+            "label": "Cornell BioHPC - Variant Calling Exercise 1 (PDF)",
+            "url": "https://biohpc.cornell.edu/lab/doc/Variant_exercise1.pdf",
+            "tool": "gatk",
+        },
+        {
+            "label": "UCLA QCB - Variant Calling with GATK Winter2020 (PDF)",
+            "url": "https://qcb.ucla.edu/wp-content/uploads/sites/14/2020/03/VariantCallingWithGATK_WINTER2020.pdf",
+            "tool": "gatk",
+        },
+        {
+            "label": "Evomics - Human Variant Calling Workshop (PDF)",
+            "url": "https://evomics.org/wp-content/uploads/2020/01/Human-Variant-Calling-Workshop.pdf",
+            "tool": "gatk",
+        },
+        {
+            "label": "QIAGEN - BLAST Tips Tutorial (PDF)",
+            "url": "https://resources.qiagenbioinformatics.com/tutorials/BLAST_tips.pdf",
+            "tool": "blast",
+        },
+        {
+            "label": "Cornell BioHPC - Lab and Linux Basics Workshop (PDF)",
+            "url": "https://biohpc.cornell.edu/lab/doc/BioHPC_Lab_and_Linux_Basics.pdf",
+        },
+        {
+            "label": "Cornell BioHPC - Linux for Biologists (PDF)",
+            "url": "https://biohpc.cornell.edu/lab/doc/Linux_workshop.pdf",
+        },
+        {
+            "label": "Evomics - Genomics Tutorial 2019 (PDF)",
+            "url": "https://files.evomics.org/2019/01/genomics_tutorial_2019.pdf",
+        },
+        {
+            "label": "CRUK Bioinformatics - Short Read Alignment Lecture (PDF)",
+            "url": "https://bioinformatics-core-shared-training.github.io/cruk-autumn-school-2017/Introduction/SS_DB/Materials/Lectures/Lecture3_ShortRead_Alignment_SS.pdf",
+        },
+        {
             "label": "Ohio Supercomputer Center - BWA",
             "url": "https://www.osc.edu/resources/available_software/software_list/bwa",
         },
