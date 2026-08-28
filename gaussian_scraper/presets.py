@@ -141,6 +141,14 @@ GAUSSIAN_PRESET = {
             "label": "Illinois SCS - Gaussian GaussView Tutorial (PDF)",
             "url": "https://scs.illinois.edu/system/files/inline-files/SCS-Gaussian-GaussView-tutorial_1.pdf",
         },
+        {
+            "label": "NBO Wisconsin - INSTALL.gaussian (Gaussian-09 D.01/NBO6 txt)",
+            "url": "https://nbo.chem.wisc.edu/INSTALL.gaussian",
+        },
+        {
+            "label": "NBO Wisconsin - INSTALL.g09c01 (Gaussian-09 C.01/NBO6 txt)",
+            "url": "https://nbo.chem.wisc.edu/INSTALL.g09c01",
+        },
     ],
     "se_sources": [
         {
@@ -397,6 +405,30 @@ BIOINFORMATICS_PRESET = {
         {
             "label": "Cornell BioHPC - Software Guide",
             "url": "https://biohpc.cornell.edu/lab/userguide.aspx?a=software&i=445",
+        },
+        {
+            "label": "Babraham - Analysing RNA-Seq data Exercise (DOCX)",
+            "url": "https://www.bioinformatics.babraham.ac.uk/training/RNASeq_Course/Analysing%20RNA-Seq%20data%20Exercise.docx",
+        },
+        {
+            "label": "Babraham - Sequencing QC Exercise (DOCX)",
+            "url": "https://www.bioinformatics.babraham.ac.uk/training/Sequence_QC_Course/Sequencing%20QC%20Exercise.docx",
+        },
+        {
+            "label": "Babraham - Linux Bootcamp Exercises (DOCX)",
+            "url": "https://www.bioinformatics.babraham.ac.uk/training/Linux%20bootcamp/Linux%20Bootcamp%20Exercises.docx",
+        },
+        {
+            "label": "VCRU Wisconsin - BBMap README.txt",
+            "url": "https://vcru.wisc.edu/simonlab/bioinformatics/programs/bbmap/readme.txt",
+        },
+        {
+            "label": "DarkHorse2 GitHub - README.txt",
+            "url": "https://raw.githubusercontent.com/spodell/Darkhorse2/master/README.txt",
+        },
+        {
+            "label": "VCRU Wisconsin - Platanus README.txt",
+            "url": "https://vcru.wisc.edu/simonlab/bioinformatics/programs/platanus/README.txt",
         },
     ],
     "se_sources": [

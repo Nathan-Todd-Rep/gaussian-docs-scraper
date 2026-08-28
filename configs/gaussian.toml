@@ -114,6 +114,14 @@ url = "https://faculty.washington.edu/tingcao/wordpress/wp-content/uploads/2020/
 label = "Illinois SCS - Gaussian GaussView Tutorial (PDF)"
 url = "https://scs.illinois.edu/system/files/inline-files/SCS-Gaussian-GaussView-tutorial_1.pdf"
 
+[[html_sources]]
+label = "NBO Wisconsin - INSTALL.gaussian (Gaussian-09 D.01/NBO6 txt)"
+url = "https://nbo.chem.wisc.edu/INSTALL.gaussian"
+
+[[html_sources]]
+label = "NBO Wisconsin - INSTALL.g09c01 (Gaussian-09 C.01/NBO6 txt)"
+url = "https://nbo.chem.wisc.edu/INSTALL.g09c01"
+
 [[se_sources]]
 label = "Matter Modeling Stack Exchange - gaussian tag"
 site = "mattermodeling"

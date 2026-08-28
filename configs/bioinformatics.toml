@@ -181,6 +181,30 @@ url = "https://gatk.broadinstitute.org/hc/en-us/articles/360046877112-GATK-on-lo
 label = "Cornell BioHPC - Software Guide"
 url = "https://biohpc.cornell.edu/lab/userguide.aspx?a=software&i=445"
 
+[[html_sources]]
+label = "Babraham - Analysing RNA-Seq data Exercise (DOCX)"
+url = "https://www.bioinformatics.babraham.ac.uk/training/RNASeq_Course/Analysing%20RNA-Seq%20data%20Exercise.docx"
+
+[[html_sources]]
+label = "Babraham - Sequencing QC Exercise (DOCX)"
+url = "https://www.bioinformatics.babraham.ac.uk/training/Sequence_QC_Course/Sequencing%20QC%20Exercise.docx"
+
+[[html_sources]]
+label = "Babraham - Linux Bootcamp Exercises (DOCX)"
+url = "https://www.bioinformatics.babraham.ac.uk/training/Linux%20bootcamp/Linux%20Bootcamp%20Exercises.docx"
+
+[[html_sources]]
+label = "VCRU Wisconsin - BBMap README.txt"
+url = "https://vcru.wisc.edu/simonlab/bioinformatics/programs/bbmap/readme.txt"
+
+[[html_sources]]
+label = "DarkHorse2 GitHub - README.txt"
+url = "https://raw.githubusercontent.com/spodell/Darkhorse2/master/README.txt"
+
+[[html_sources]]
+label = "VCRU Wisconsin - Platanus README.txt"
+url = "https://vcru.wisc.edu/simonlab/bioinformatics/programs/platanus/README.txt"
+
 [[se_sources]]
 label = "Bioinformatics Stack Exchange - rna-seq tag"
 site = "bioinformatics"
