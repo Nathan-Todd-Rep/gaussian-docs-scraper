@@ -121,8 +121,9 @@ needs to load the entire scraped dataset to answer one question. See
 Every source in `configs/*.toml` today was found by manually web-searching and
 hand-adding it. The `/discover-sources <domain>` command (a Claude Code skill,
 see `.claude/skills/discover-sources/`) automates the search step: it looks for
-new candidate HTML documentation pages for a domain, validates them with
-`check_sources.py`, and writes a proposal file to
+new candidate documentation sources for a domain (HTML pages, PDFs, Word docs,
+PowerPoint slides, or plain text -- anything `fetch_page_text` can read),
+validates them with `check_sources.py`, and writes a proposal file to
 `discovery_candidates/{domain}_{date}.md` -- it never edits `configs/*.toml` or
 `presets.py` itself. Reviewing the proposal and copying accepted sources into a
 config stays a manual step.
@@ -132,7 +133,7 @@ config stays a manual step.
 /discover-sources gaussian
 ```
 
-Currently covers HTML sources only, not Stack Exchange tags.
+Currently covers `html_sources` only, not Stack Exchange tags.
 
 ---
 
@@ -161,4 +162,6 @@ See `gaussian_scraper/storage.py` for the schema and `search_docs.py` /
 py -m pytest -v
 ```
 
-22 tests across the scraper, Stack Exchange fetcher, and summarizer modules.
+Covers fetching (HTML/PDF/DOCX/PPTX/TXT), passage extraction and deduplication,
+the Stack Exchange client, config loading, SQLite storage, source health-checking,
+TF-IDF retrieval, the wizard, and summarization.
