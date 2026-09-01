@@ -15,6 +15,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import sys
 
 from gaussian_scraper.passage_index import PassageIndex
 
@@ -54,6 +55,12 @@ def print_matches(matches: list) -> None:
 
 
 def main() -> None:
+    # Some scraped PDF text contains ligature characters (e.g. "ﬁ") that
+    # aren't representable in Windows' default cp1252 console encoding --
+    # replace rather than crash so a passage's content never takes down
+    # the query that surfaced it.
+    sys.stdout.reconfigure(errors="replace")
+
     args = parse_args()
 
     try:
