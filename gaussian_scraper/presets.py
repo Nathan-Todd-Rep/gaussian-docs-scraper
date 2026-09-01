@@ -1020,6 +1020,21 @@ BIOINFORMATICS_PRESET = {
             "url": "https://samtools.github.io/bcftools/howtos/variant-calling.html",
             "tool": "bcftools",
         },
+        {
+            "label": "Wayne State - How to Use SAMtools",
+            "url": "https://tech.wayne.edu/kb/high-performance-computing/hpc-tutorials/500104",
+            "tool": "samtools",
+        },
+        {
+            "label": "Nebraska HCC - Running SAMtools Commands",
+            "url": "https://hcc.unl.edu/docs/applications/app_specific/bioinformatics_tools/data_manipulation_tools/samtools/running_samtools_commands/",
+            "tool": "samtools",
+        },
+        {
+            "label": "Idaho HPC - SAMtools",
+            "url": "https://hpc.uidaho.edu/compute/Applications/SAMtools.html",
+            "tool": "samtools",
+        },
     ],
     "se_sources": [
         {
