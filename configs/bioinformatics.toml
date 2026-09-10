@@ -550,6 +550,21 @@ label = "Idaho HPC - SAMtools"
 url = "https://hpc.uidaho.edu/compute/Applications/SAMtools.html"
 tool = "samtools"
 
+[[html_sources]]
+label = "Minnesota Supercomputing Institute - BWA"
+url = "https://msi.umn.edu/software/msi-software/bwa"
+tool = "bwa"
+
+[[html_sources]]
+label = "UT Austin BioITeam - Mapping with BWA"
+url = "https://cloud.wikis.utexas.edu/wiki/display/bioiteam/Mapping+with+BWA"
+tool = "bwa"
+
+[[html_sources]]
+label = "UCLA Pellegrini Lab - SCP BWA Guide (PDF)"
+url = "https://www.pellegrini.mcdb.ucla.edu/pellegrini/pellegrinilabscps/SCP-BWA_Final.pdf"
+tool = "bwa"
+
 [[se_sources]]
 label = "Bioinformatics Stack Exchange - rna-seq tag"
 site = "bioinformatics"
