@@ -1035,6 +1035,21 @@ BIOINFORMATICS_PRESET = {
             "url": "https://hpc.uidaho.edu/compute/Applications/SAMtools.html",
             "tool": "samtools",
         },
+        {
+            "label": "Minnesota Supercomputing Institute - BWA",
+            "url": "https://msi.umn.edu/software/msi-software/bwa",
+            "tool": "bwa",
+        },
+        {
+            "label": "UT Austin BioITeam - Mapping with BWA",
+            "url": "https://cloud.wikis.utexas.edu/wiki/display/bioiteam/Mapping+with+BWA",
+            "tool": "bwa",
+        },
+        {
+            "label": "UCLA Pellegrini Lab - SCP BWA Guide (PDF)",
+            "url": "https://www.pellegrini.mcdb.ucla.edu/pellegrini/pellegrinilabscps/SCP-BWA_Final.pdf",
+            "tool": "bwa",
+        },
     ],
     "se_sources": [
         {
