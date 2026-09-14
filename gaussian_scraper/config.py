@@ -45,7 +45,7 @@ class ScraperConfig:
     def __post_init__(self):
         if self.output_path is None:
             self.output_path = DEFAULT_OUTPUT_DIR / f"{self.name}.db"
-        self.output_path = Path(self.output_path)
+        self.output_path = Path(self.output_path).expanduser()
 
     def validate(self) -> "ScraperConfig":
         """
@@ -169,8 +169,11 @@ def save_toml_config(config: ScraperConfig, path: Path) -> None:
     lines = [
         f"name = {_toml_string(config.name)}",
         f"keywords = {_toml_string_array(config.keywords)}",
-        f"output_path = {_toml_string(str(config.output_path))}",
     ]
+
+    default_output_path = DEFAULT_OUTPUT_DIR / f"{config.name}.db"
+    if config.output_path != default_output_path:
+        lines.append(f"output_path = {_toml_string(str(config.output_path))}")
 
     for source in config.html_sources:
         lines.append("")

@@ -244,3 +244,31 @@ def test_save_toml_config_escapes_special_characters(tmp_path):
     reloaded = load_toml_config(save_path)
 
     assert reloaded.html_sources[0]["label"] == 'Harvard "RC"'
+
+def test_config_expands_user_output_path(monkeypatch, tmp_path):
+    monkeypatch.setenv("HOME", str(tmp_path))
+
+    config = _valid_config(output_path=Path("~/.inkly/custom.db"))
+
+    assert config.output_path == tmp_path / ".inkly" / "custom.db"
+
+
+def test_save_toml_config_omits_default_output_path(tmp_path):
+    config = _valid_config()
+    save_path = tmp_path / "gaussian.toml"
+
+    save_toml_config(config, save_path)
+
+    saved = save_path.read_text(encoding="utf-8")
+    assert "output_path" not in saved
+
+
+def test_save_toml_config_preserves_custom_output_path(tmp_path):
+    custom = tmp_path / "custom" / "gaussian.db"
+    config = _valid_config(output_path=custom)
+    save_path = tmp_path / "gaussian.toml"
+
+    save_toml_config(config, save_path)
+
+    reloaded = load_toml_config(save_path)
+    assert reloaded.output_path == custom
