@@ -17,7 +17,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from gaussian_scraper.passage_index import PassageIndex
+from gaussian_scraper.search import search_docs
 
 
 def parse_args() -> argparse.Namespace:
@@ -64,11 +64,15 @@ def main() -> None:
     args = parse_args()
 
     try:
-        index = PassageIndex.load(args.domain)
+        matches = search_docs(
+            args.domain,
+            args.query,
+            top_k=args.top_k,
+            tool=args.tool,
+        )
     except FileNotFoundError as e:
         raise SystemExit(str(e))
 
-    matches = index.search(args.query, top_k=args.top_k, tool=args.tool)
     print_matches(matches)
 
 
