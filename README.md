@@ -17,11 +17,80 @@ Passages are keyword-filtered and capped per source to keep the output focused. 
 
 ## Installation
 
-Install dependencies:
+Use a Python virtual environment so the scraper and applications that consume
+it, such as Inkly, use the same Python packages.
+
+### 1. Create and activate a virtual environment
+
+Linux/macOS:
 
 ```bash
-pip install requests beautifulsoup4 pypdf python-docx python-pptx
+python3 -m venv .venv
+source .venv/bin/activate
 ```
+
+Windows:
+
+```bash
+py -m venv .venv
+.venv\Scripts\activate
+```
+
+If Inkly already has a virtual environment, activate that environment instead
+of creating a separate one.
+
+### 2. Install the scraper into the active environment
+
+From the root of this repository:
+
+```bash
+python -m pip install -e .
+```
+
+The editable install:
+
+- installs the scraper's runtime dependencies
+- makes `gaussian_scraper` importable from other projects in the environment
+- keeps local source-code changes immediately available without reinstalling
+
+Do not run `setup.py` directly. Use `python -m pip install -e .`.
+
+For development and testing:
+
+```bash
+python -m pip install -e ".[test]"
+```
+
+### 3. Verify the installation
+
+From any directory:
+
+```bash
+python -c "from gaussian_scraper.search import search_docs; print(search_docs)"
+```
+
+If the command prints a `search_docs` function, the scraper package is
+available to other applications in that environment.
+
+### Using the scraper with Inkly
+
+Inkly and `gaussian-docs-scraper` can remain separate repositories. For local
+Phase 1 integration, they must use the same activated Python environment.
+
+Typical setup:
+
+```bash
+# Activate the environment used by Inkly first.
+
+cd /path/to/gaussian-docs-scraper
+python -m pip install -e .
+
+cd /path/to/hpc-ink-setup
+python -c "from gaussian_scraper.search import search_docs; print(search_docs)"
+```
+
+Run the editable-install command after the initial clone/setup. Because it is
+editable, ordinary scraper source changes do not require reinstalling it.
 
 ---
 
