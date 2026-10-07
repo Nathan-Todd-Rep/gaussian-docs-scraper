@@ -247,6 +247,7 @@ def test_save_toml_config_escapes_special_characters(tmp_path):
 
 def test_config_expands_user_output_path(monkeypatch, tmp_path):
     monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))
 
     config = _valid_config(output_path=Path("~/.inkly/custom.db"))
 
